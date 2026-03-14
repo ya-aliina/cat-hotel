@@ -42,13 +42,13 @@ const FEATURES_DATA = [
 const Features = memo(() => {
   return (
     <section className="relative overflow-hidden pt-20">
-      <div className="absolute top-6 right-0 z-0 pointer-events-none rotate-[25deg] ">
+      <div className="absolute top-5 right-0 z-0 pointer-events-none rotate-[25deg] ">
         <Image
           src="/paw.svg"
           alt=""
           width={400}
           height={400}
-          className="w-[400px] h-auto"
+          className="w-[367px] h-auto"
           priority={false}
         />
       </div>
