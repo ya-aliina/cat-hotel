@@ -3,8 +3,8 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono, Inter } from 'next/font/google';
 
+import Footer from '@/components/shared/Footer/Footer';
 import Header from '@/components/shared/Header/Header';
-import Footer from '@/components/shared/Footer/Footer'
 import { cn } from '@/lib/utils';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
@@ -33,9 +33,7 @@ export default function RootLayout({
     <html lang="ua" className={cn('font-sans', inter.variable)}>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased pt-20`}>
         <Header />
-        <main className='bg-[#FFFDFB]'>
-          {children}
-        </main>
+        <main className="bg-[#FFFDFB]">{children}</main>
         <Footer />
       </body>
     </html>
