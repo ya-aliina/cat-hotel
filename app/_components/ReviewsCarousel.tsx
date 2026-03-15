@@ -127,7 +127,7 @@ const ReviewCard = React.memo(({ review }: { review: Review }) => {
           >
             <path
               d="M0 20V9.52381L7.11111 0H10.6667L5.33333 9.52381H10.6667V20H0ZM13.3333 20V9.52381L20.4444 0H24L18.6667 9.52381H24V20H13.3333Z"
-              fill="#FAC663"
+              fill="var(--brand-yellow)"
             />
           </svg>
         </div>
@@ -169,7 +169,7 @@ const Dots = React.memo(
               }}
               className={cn(
                 'h-3 w-3 rounded-full transition-all duration-300',
-                current === i ? 'bg-[#FAC663]' : 'bg-[#D9D9D9]',
+                current === i ? 'bg-brand-yellow' : 'bg-[#D9D9D9]',
               )}
               aria-label={`Перейти до слайду ${i + 1}`}
               aria-current={current === i}
@@ -238,7 +238,7 @@ export function ReviewsCarousel() {
       </div>
 
       <div className="max-w-[1200px] mx-auto px-4 relative z-10 mb-12">
-        <h2 className="text-3xl md:text-4xl font-bold text-center text-[#1A202C]">Відгуки</h2>
+        <h2 className="text-3xl md:text-4xl font-bold text-center">Відгуки</h2>
       </div>
 
       <div className="relative z-10 w-full">
@@ -258,8 +258,8 @@ export function ReviewsCarousel() {
               <Dots count={scrollSnaps.length} current={current} onDotClick={handleDotClick} />
 
               <div className="hidden md:flex gap-4 ml-auto">
-                <CarouselPrevious className="static h-12 w-12 translate-y-0 border-none bg-white shadow-sm hover:bg-[#FAC663] hover:text-white transition-all" />
-                <CarouselNext className="static h-12 w-12 translate-y-0 border-none bg-white shadow-sm hover:bg-[#FAC663] hover:text-white transition-all" />
+                <CarouselPrevious className="static h-12 w-12 translate-y-0 border-none bg-white shadow-sm hover:bg-brand-yellow hover:text-white transition-all" />
+                <CarouselNext className="static h-12 w-12 translate-y-0 border-none bg-white shadow-sm hover:bg-brand-yellow hover:text-white transition-all" />
               </div>
             </div>
           </div>

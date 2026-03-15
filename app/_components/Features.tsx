@@ -54,9 +54,7 @@ const Features = memo(() => {
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl md:text-4xl font-bold text-center text-[#1A202C] mb-16">
-          Чому ми?
-        </h2>
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">Чому ми?</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {FEATURES_DATA.map((feature) => {
@@ -65,7 +63,7 @@ const Features = memo(() => {
                 key={feature.title}
                 className="p-8 rounded-[8px] bg-white border border-gray-50 shadow-[0_10px_40px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] transition-all duration-300"
               >
-                <div className="w-16 h-16 rounded-full bg-[#FAC663] flex items-center justify-center mb-8">
+                <div className="w-16 h-16 rounded-full bg-brand-yellow flex items-center justify-center mb-8">
                   <div className="relative w-8 h-8">
                     <Image
                       src={feature.icon}
@@ -76,7 +74,7 @@ const Features = memo(() => {
                   </div>
                 </div>
 
-                <h3 className="text-[22px] font-bold text-[#1A202C] mb-4">{feature.title}</h3>
+                <h3 className="text-[22px] font-bold mb-4">{feature.title}</h3>
 
                 <p className="text-gray-500 leading-relaxed text-[15px]">{feature.description}</p>
               </div>

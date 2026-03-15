@@ -4,10 +4,31 @@ import { cn } from '@/lib/utils';
 
 import PawIcon from './icons/PawIcon';
 
+interface ButtonStyle {
+  button: string;
+  circle: string;
+  icon: string;
+}
+
+const variants: Record<'default' | 'accent', ButtonStyle> = {
+  default: {
+    button: 'bg-white text-[#1A202C]',
+    circle: 'bg-orange-500',
+    icon: 'text-white',
+  },
+  accent: {
+    button: 'bg-[#FF7043] text-white',
+    circle: 'bg-white',
+    icon: 'text-[#FF7043]',
+  },
+};
+
+type PawVariant = keyof typeof variants;
+
 interface PawButtonProps {
   className?: string;
   children: ReactNode;
-  variant?: 'accent' | 'default';
+  variant?: PawVariant;
   onClick?: () => void;
 }
 
@@ -17,18 +38,27 @@ export const PawButton = ({
   onClick,
   variant = 'default',
 }: PawButtonProps) => {
+  const style = variants[variant];
+
   return (
     <button
+      type="button"
       onClick={onClick}
       className={cn(
-        'flex items-center gap-4 rounded-full p-2 pl-4  font-medium shadow cursor-pointer hover:scale-105 active:scale-95 transition-transform duration-300 ease-out hover:scale-[1.03]',
-        variant === 'accent' ? 'bg-red-500' : 'bg-white',
+        'flex items-center justify-between gap-4 rounded-full p-2 pl-6 font-medium shadow cursor-pointer transition-transform duration-300 ease-out hover:scale-[1.03] active:scale-95',
+        style.button,
         className,
       )}
     >
-      {children}
-      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-500 rotate-[-10deg] translate-x-[1px] translate-y-[1px]">
-        <PawIcon className="h-5 w-5 text-white " />
+      <span className="text-[16px] whitespace-nowrap">{children}</span>
+
+      <span
+        className={cn(
+          'flex h-10 w-10 shrink-0 items-center justify-center rounded-full rotate-[-10deg] translate-x-[1px] translate-y-[1px]',
+          style.circle,
+        )}
+      >
+        <PawIcon className={cn('h-5 w-5', style.icon)} />
       </span>
     </button>
   );

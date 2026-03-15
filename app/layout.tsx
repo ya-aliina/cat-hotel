@@ -3,8 +3,8 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono, Inter } from 'next/font/google';
 
-import Footer from '@/components/shared/Footer/Footer';
-import Header from '@/components/shared/Header/Header';
+import Footer from '@/components/shared/Footer';
+import Header from '@/components/shared/Header';
 import { cn } from '@/lib/utils';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
