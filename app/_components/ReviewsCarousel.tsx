@@ -115,7 +115,7 @@ const REVIEWS: Review[] = [
 
 const ReviewCard = React.memo(({ review }: { review: Review }) => {
   return (
-    <div className="bg-white rounded-[8px] p-6 lg:p-[30px] shadow-[0px_4px_20px_rgba(0,0,0,0.03)] border border-gray-50 h-full md:h-[206px] flex flex-col justify-between">
+    <div className="bg-white rounded-[8px] p-6 lg:p-7.5 shadow-[0px_4px_20px_rgba(0,0,0,0.03)] border border-gray-50 h-full md:h-51.5 flex flex-col justify-between">
       <div className="flex gap-4 lg:gap-6">
         <div className="shrink-0 pt-1">
           <svg
@@ -137,7 +137,7 @@ const ReviewCard = React.memo(({ review }: { review: Review }) => {
         </p>
       </div>
 
-      <div className="flex justify-between items-center text-[13px] lg:text-[14px] text-gray-400 pl-[48px] lg:pl-[56px] font-light">
+      <div className="flex justify-between items-center text-[13px] lg:text-[14px] text-gray-400 pl-12 lg:pl-14 font-light">
         <span>{review.author}</span>
         <span>{review.date}</span>
       </div>
@@ -226,18 +226,18 @@ export function ReviewsCarousel() {
 
   return (
     <section className="w-full relative overflow-hidden py-16 md:py-24">
-      <div className="absolute top-[-20px] -right-[40px] md:top-3 md:right-0 lg:right-[-20px] z-0 pointer-events-none rotate-[-15deg]">
+      <div className="absolute -top-5 -right-10 md:top-3 md:right-0 lg:-right-5 z-0 pointer-events-none rotate-[-15deg]">
         <Image
           src="/paw.svg"
           alt=""
           width={400}
           height={400}
-          className="w-[367px] h-auto"
+          className="w-91.75 h-auto"
           priority={false}
         />
       </div>
 
-      <div className="max-w-[1200px] mx-auto px-4 relative z-10 mb-12">
+      <div className="max-w-300 mx-auto px-4 relative z-10 mb-12">
         <h2 className="text-3xl md:text-4xl font-bold text-center">Відгуки</h2>
       </div>
 
@@ -246,15 +246,15 @@ export function ReviewsCarousel() {
           <CarouselContent className="-ml-4 pl-4 xl:pl-[calc((100vw-1200px)/2+1rem)]">
             {REVIEWS.map((review) => {
               return (
-                <CarouselItem key={review.id} className="pl-4 basis-[90%] md:basis-[470px] py-4">
+                <CarouselItem key={review.id} className="pl-4 basis-[90%] md:basis-117.5 py-4">
                   <ReviewCard review={review} />
                 </CarouselItem>
               );
             })}
           </CarouselContent>
 
-          <div className="max-w-[1200px] mx-auto px-4 mt-8">
-            <div className="flex items-center justify-between relative min-h-[48px]">
+          <div className="max-w-300 mx-auto px-4 mt-8">
+            <div className="flex items-center justify-between relative min-h-12">
               <Dots count={scrollSnaps.length} current={current} onDotClick={handleDotClick} />
 
               <div className="hidden md:flex gap-4 ml-auto">

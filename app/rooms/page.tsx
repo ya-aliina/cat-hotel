@@ -67,14 +67,14 @@ const ROOMS = [
 function RoomCard({ room }: { room: (typeof ROOMS)[0] }) {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden flex flex-col h-full hover:shadow-md transition-all duration-300">
-      <div className="relative h-[220px] w-full">
+      <div className="relative h-55 w-full">
         <Image src={room.image} alt={room.title} fill className="object-cover" />
       </div>
 
-      <div className="p-6 flex flex-col flex-grow">
+      <div className="p-6 flex flex-col grow">
         <h3 className="text-xl font-bold mb-4">{room.title}</h3>
 
-        <div className="space-y-1.5 mb-6 text-sm flex-grow">
+        <div className="space-y-1.5 mb-6 text-sm grow">
           <p className="opacity-80">Розміри (ШхГхВ) — {room.size} см</p>
           <p className="opacity-80">Площа — {room.area.toFixed(2).replace('.', ',')} м2</p>
 
@@ -83,11 +83,13 @@ function RoomCard({ room }: { room: (typeof ROOMS)[0] }) {
             <div className="flex gap-1.5">
               {room.equipment.map((item) => {
                 return (
-                  <img
+                  <Image
                     key={item}
                     src={`/amenities/${item}.svg`}
                     alt={item}
-                    className="w-4 h-4 opacity-50"
+                    width={16}
+                    height={16}
+                    className="w-4 h-4 opacity-50 object-contain"
                   />
                 );
               })}
@@ -108,7 +110,7 @@ function RoomCard({ room }: { room: (typeof ROOMS)[0] }) {
 export default function RoomsPage() {
   return (
     <main className="min-h-screen">
-      <div className="max-w-[1200px] mx-auto px-4 pt-32 pb-24">
+      <div className="max-w-300 mx-auto px-4 pt-32 pb-24">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
           <h1 className="text-4xl font-bold">Наші номери</h1>
           <div className="relative">
@@ -119,7 +121,7 @@ export default function RoomsPage() {
         </div>
 
         <div className="flex flex-col md:flex-row gap-12">
-          <aside className="w-full md:w-[250px] shrink-0 space-y-10">
+          <aside className="w-full md:w-62.5 shrink-0 space-y-10">
             <div>
               <h4 className="font-bold mb-4">Ціна за добу, ₴</h4>
               <div className="flex items-center gap-2">
@@ -142,7 +144,11 @@ export default function RoomsPage() {
                 {['0,63 м2', '0,90 м2', '1,13 м2', '1,56 м2', '2,56 м2', '2,88 м2'].map((area) => {
                   return (
                     <label key={area} className="flex items-center gap-3 cursor-pointer text-sm">
-                      <input type="checkbox" className="w-4 h-4 accent-[#FAC663]" defaultChecked />
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4 accent-brand-yellow"
+                        defaultChecked
+                      />
                       {area}
                     </label>
                   );
@@ -175,7 +181,7 @@ export default function RoomsPage() {
             </button>
           </aside>
 
-          <div className="flex-grow grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grow grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {ROOMS.map((room) => {
               return <RoomCard key={room.id} room={room} />;
             })}

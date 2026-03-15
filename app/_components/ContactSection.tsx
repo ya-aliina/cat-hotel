@@ -39,7 +39,7 @@ const socialLinks = [
 export function ContactSection() {
   return (
     <section className="w-full bg-[#E5E3DF] overflow-hidden">
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_minmax(0,500px)_minmax(0,780px)_1fr] h-auto md:h-[500px]">
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_minmax(0,500px)_minmax(0,780px)_1fr] h-auto md:h-125">
         <div className="hidden md:block col-start-1 col-end-3 row-start-1 bg-brand-yellow" />
 
         <div className="col-start-1 md:col-start-2 md:col-end-3 row-start-1 bg-brand-yellow md:bg-transparent z-10 flex flex-col justify-center px-4 sm:px-6 lg:pl-8 lg:pr-12 py-10 md:py-0">
@@ -79,8 +79,8 @@ export function ContactSection() {
           </div>
         </div>
 
-        <div className="col-start-1 md:col-start-3 md:col-end-5 row-start-2 md:row-start-1 relative h-[350px] md:h-full overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 -bottom-[60px]">
+        <div className="col-start-1 md:col-start-3 md:col-end-5 row-start-2 md:row-start-1 relative h-87.5 md:h-full overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 -bottom-15">
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2539.88045330335!2d30.5121453!3d50.468233!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40d4ce4281f629ab%3A0x6313cd2edb6bc566!2z0LLRg9C7LiDQmtC-0YHRgtGP0L3RgtC40L3RltCy0YHRjNC60LAsIDE5LCDQmtC40ZfQsiwgMDIwMDA!5e0!3m2!1sru!2sua!4v1700000000000!5m2!1sru!2sua"
               width="100%"

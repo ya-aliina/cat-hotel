@@ -54,7 +54,7 @@ export const PawButton = ({
 
       <span
         className={cn(
-          'flex h-10 w-10 shrink-0 items-center justify-center rounded-full rotate-[-10deg] translate-x-[1px] translate-y-[1px]',
+          'flex h-10 w-10 shrink-0 items-center justify-center rounded-full rotate-[-10deg] translate-x-px translate-y-px',
           style.circle,
         )}
       >
