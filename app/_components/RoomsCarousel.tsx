@@ -180,7 +180,7 @@ export function RoomsCarousel() {
               })}
             </CarouselContent>
 
-            <div className="flex items-center justify-between mt-8 relative min-h-[48px]">
+            <div className="flex items-center justify-between mt-8 relative min-h-12">
               <Dots count={ROOMS.length} current={current} onDotClick={handleDotClick} />
 
               <div className="hidden md:flex gap-4 ml-auto">
