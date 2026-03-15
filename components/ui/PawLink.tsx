@@ -22,11 +22,11 @@ export const PawLink = ({ href, children, className, onClick }: PawLinkProps) =>
         {children}
       </Link>
 
-      <div className="absolute z-0 pointer-events-none w-[23px] h-[23px] right-[-18px] top-[2px]">
+      <div className="absolute z-0 pointer-events-none w-5.75 h-5.75 -right-4.5 top-0.5">
         <PawIcon
           className="w-full h-full text-brand-orange opacity-0 transform -rotate-12 scale-90 
                      group-hover:opacity-30 group-hover:rotate-0 group-hover:scale-110 
-                     transition-all duration-[600ms] ease-[cubic-bezier(0.175,0.885,0.32,1.275)]"
+                     transition-all duration-600 ease-[cubic-bezier(0.175,0.885,0.32,1.275)]"
         />
       </div>
     </div>

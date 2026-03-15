@@ -10,7 +10,6 @@ import { cn } from '@/lib/utils';
 const NAV_LINKS = [
   { title: 'Про нас', href: '/' },
   { title: 'Номери', href: '/rooms' },
-  { title: 'Галерея', href: '/gallery' },
   { title: 'Вхід', href: '/login' },
 ];
 
@@ -35,14 +34,14 @@ const Footer = ({ className }: { className?: string }) => {
             <Link href="/" className="mb-6">
               <Image src="/logo.svg" alt="Logo" width={60} height={50} className="object-contain" />
             </Link>
-            <p className="text-gray-500 text-sm leading-relaxed max-w-[200px]">
+            <p className="text-gray-500 text-sm leading-relaxed max-w-50">
               Найкращий відпочинок для вашого котика. Комфорт, турбота та безпека у кожному номері.
             </p>
           </div>
 
           {/* Навігація */}
           <div>
-            <h4 className="text-[#1A202C] font-bold mb-6 text-xs uppercase tracking-[0.1em]">
+            <h4 className="text-[#1A202C] font-bold mb-6 text-xs uppercase tracking-widest">
               Навігація
             </h4>
             <ul className="space-y-3">
@@ -60,7 +59,7 @@ const Footer = ({ className }: { className?: string }) => {
 
           {/* Контакти з лапкою */}
           <div>
-            <h4 className="text-[#1A202C] font-bold mb-6 text-xs uppercase tracking-[0.1em]">
+            <h4 className="text-[#1A202C] font-bold mb-6 text-xs uppercase tracking-widest">
               Контакти
             </h4>
             <ul className="space-y-3">
@@ -81,7 +80,7 @@ const Footer = ({ className }: { className?: string }) => {
 
           {/* Соцмережі */}
           <div>
-            <h4 className="text-[#1A202C] font-bold mb-6 text-xs uppercase tracking-[0.1em]">
+            <h4 className="text-[#1A202C] font-bold mb-6 text-xs uppercase tracking-widest">
               Ми у соцмережах
             </h4>
             <div className="flex space-x-4">

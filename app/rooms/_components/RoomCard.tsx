@@ -4,10 +4,24 @@ import Image from 'next/image';
 
 import { PawButton } from '@/components/ui/PawButton';
 
-export function RoomCard({ room }: { room: any }) {
+export interface Room {
+  id: string;
+  title: string;
+  image: string;
+  size: string;
+  area: number;
+  equipment: string[];
+  price: number;
+}
+
+interface RoomCardProps {
+  room: Room;
+}
+
+export function RoomCard({ room }: RoomCardProps) {
   return (
     <div className="bg-white rounded-[8px] shadow-[0px_4px_20px_rgba(0,0,0,0.03)] border border-gray-100 flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-md">
-      <div className="relative h-[200px] w-full">
+      <div className="relative h-50 w-full">
         <Image
           src={room.image}
           alt={room.title}

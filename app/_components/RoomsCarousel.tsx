@@ -41,7 +41,7 @@ const ROOMS: Room[] = [
 const RoomCard = React.memo(({ room, isPriority }: { room: Room; isPriority: boolean }) => {
   return (
     <div className="flex flex-col md:flex-row items-center justify-center">
-      <div className="relative w-full max-w-[600px] h-[300px] md:h-[404px] rounded-[10px] overflow-hidden shadow-sm z-0 shrink-0">
+      <div className="relative w-full max-w-150 h-75 md:h-101 rounded-[10px] overflow-hidden shadow-sm z-0 shrink-0">
         <Image
           src={room.image}
           alt={`Фото номеру ${room.title}`}
@@ -52,8 +52,8 @@ const RoomCard = React.memo(({ room, isPriority }: { room: Room; isPriority: boo
         />
       </div>
 
-      <div className="relative z-10 bg-white p-6 md:p-10 rounded-[8px] border border-gray-50 mt-[-60px] md:mt-0 md:-ml-[100px] w-[95%] md:w-[500px] md:h-[284px] flex flex-col justify-center">
-        <div className="md:max-w-[283px]">
+      <div className="relative z-10 bg-white p-6 md:p-10 rounded-[8px] border border-gray-50 -mt-15 md:mt-0 md:-ml-25 w-[95%] md:w-125 md:h-71 flex flex-col justify-center">
+        <div className="md:max-w-70.75">
           <h3 className="text-xl md:text-2xl font-bold  mb-4">{room.title}</h3>
 
           <ul className="space-y-2 mb-6">
@@ -148,8 +148,8 @@ export function RoomsCarousel() {
 
   return (
     <section className="w-full relative overflow-hidden py-10 md:pt-20">
-      <div className="max-w-[1000px] mx-auto px-4 relative z-0">
-        <div className="absolute top-[30px] -left-0 md:top-0 md:-left-[260px] z-[-1] w-[350px] md:w-[500px] pointer-events-none opacity-30">
+      <div className="max-w-250 mx-auto px-4 relative z-0">
+        <div className="absolute top-7.5 left-0 md:top-0 md:-left-65 z-[-1] w-87.5 md:w-125 pointer-events-none opacity-30">
           <svg
             viewBox="0 0 483 151"
             fill="none"
@@ -180,7 +180,7 @@ export function RoomsCarousel() {
               })}
             </CarouselContent>
 
-            <div className="flex items-center justify-between mt-8 relative min-h-[48px]">
+            <div className="flex items-center justify-between mt-8 relative min-h-12">
               <Dots count={ROOMS.length} current={current} onDotClick={handleDotClick} />
 
               <div className="hidden md:flex gap-4 ml-auto">
