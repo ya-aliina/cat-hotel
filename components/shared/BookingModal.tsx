@@ -1,5 +1,6 @@
 'use client';
 
+import { XIcon } from 'lucide-react';
 import Image from 'next/image';
 
 import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog';
@@ -38,6 +39,16 @@ export function BookingModal({
       <DialogContent className="p-0 bg-transparent shadow-none ring-0">
         <div className="max-w-7xl w-full flex justify-center relative z-10">
           <div className="w-full max-w-140 bg-white rounded-[30px] shadow-xl p-8 md:p-12 relative overflow-hidden transition-all duration-500">
+            <button
+              type="button"
+              onClick={() => {
+                return onOpenChange(false);
+              }}
+              className="absolute top-5 right-5 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white/70 text-gray-500 hover:bg-white hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
+            >
+              <XIcon className="h-5 w-5" />
+            </button>
+
             <div className="absolute -top-4 -left-4 w-32 h-32 pointer-events-none">
               <Image
                 src="/paw.svg"
