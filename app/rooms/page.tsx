@@ -3,20 +3,13 @@
 import { ChevronDown, Filter } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { type BookingFormState, BookingModal } from '@/components/shared/BookingModal';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { PawButton } from '@/components/ui/PawButton';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 import { ContactSection } from '../_components/ContactSection';
@@ -140,7 +133,6 @@ function useRoomFilters() {
         return false;
       if (appliedFilters.areas.length > 0 && !appliedFilters.areas.includes(index)) return false;
 
-      // Тепер room.equipment автоматично сприймається як string[], жодних милиць "as unknown as..."
       if (appliedFilters.amenities.length > 0) {
         if (
           !appliedFilters.amenities.every((amenityId) => {
@@ -196,8 +188,9 @@ export default function RoomsPage() {
 
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [bookingSuccess, setBookingSuccess] = useState(false);
 
-  const [bookingForm, setBookingForm] = useState({
+  const [bookingForm, setBookingForm] = useState<BookingFormState>({
     name: '',
     pet: '',
     phone: '',
@@ -208,6 +201,7 @@ export default function RoomsPage() {
 
   const openBookingModal = (room: Room) => {
     setSelectedRoom(room);
+    setBookingSuccess(false);
     setBookingForm({
       name: '',
       pet: '',
@@ -221,7 +215,12 @@ export default function RoomsPage() {
 
   const closeBookingModal = () => {
     setIsBookingOpen(false);
+    setBookingSuccess(false);
     setSelectedRoom(null);
+  };
+
+  const handleSuccessClose = () => {
+    closeBookingModal();
   };
 
   const handleBookingChange = (field: keyof typeof bookingForm, value: string) => {
@@ -232,8 +231,7 @@ export default function RoomsPage() {
 
   const handleBookingSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    // TODO: отправить данные на сервер
-    closeBookingModal();
+    setBookingSuccess(true);
   };
 
   return (
@@ -335,87 +333,15 @@ export default function RoomsPage() {
         </div>
       </div>
 
-      <Dialog open={isBookingOpen} onOpenChange={setIsBookingOpen}>
-        <DialogContent className="max-w-[420px]">
-          <DialogHeader>
-            <DialogTitle>Забронювати номер</DialogTitle>
-          </DialogHeader>
-
-          <form onSubmit={handleBookingSubmit} className="space-y-5">
-            <input
-              value={bookingForm.name}
-              onChange={(e) => {
-                return handleBookingChange('name', e.target.value);
-              }}
-              type="text"
-              placeholder="Ваше ім'я"
-              className="w-full h-13 px-8 rounded-full border border-gray-200 focus:border-brand-yellow focus:outline-none text-[16px]"
-            />
-            <input
-              value={bookingForm.pet}
-              onChange={(e) => {
-                return handleBookingChange('pet', e.target.value);
-              }}
-              type="text"
-              placeholder="Ім'я Питомця"
-              className="w-full h-13 px-8 rounded-full border border-gray-200 focus:border-brand-yellow focus:outline-none text-[16px]"
-            />
-            <input
-              value={bookingForm.phone}
-              onChange={(e) => {
-                return handleBookingChange('phone', e.target.value);
-              }}
-              type="tel"
-              placeholder="Телефон"
-              className="w-full h-13 px-8 rounded-full border border-gray-200 focus:border-brand-yellow focus:outline-none text-[16px]"
-            />
-            <input
-              value={bookingForm.email}
-              onChange={(e) => {
-                return handleBookingChange('email', e.target.value);
-              }}
-              type="email"
-              placeholder="E-mail"
-              className="w-full h-13 px-8 rounded-full border border-gray-200 focus:border-brand-yellow focus:outline-none text-[16px]"
-            />
-
-            <div className="flex flex-col sm:flex-row items-center gap-4">
-              <label className="flex items-center gap-2 text-sm">
-                <span>Дата заїзду</span>
-                <input
-                  value={bookingForm.dateFrom}
-                  onChange={(e) => {
-                    return handleBookingChange('dateFrom', e.target.value);
-                  }}
-                  type="date"
-                  className="w-full sm:w-auto h-13 px-4 rounded-full border border-gray-200 focus:border-brand-yellow focus:outline-none text-[16px]"
-                />
-              </label>
-              <label className="flex items-center gap-2 text-sm">
-                <span>по</span>
-                <input
-                  value={bookingForm.dateTo}
-                  onChange={(e) => {
-                    return handleBookingChange('dateTo', e.target.value);
-                  }}
-                  type="date"
-                  className="w-full sm:w-auto h-13 px-4 rounded-full border border-gray-200 focus:border-brand-yellow focus:outline-none text-[16px]"
-                />
-              </label>
-            </div>
-
-            <DialogFooter>
-              <PawButton
-                type="submit"
-                variant="accent"
-                className="min-w-48 bg-brand-orange text-white"
-              >
-                Відправити заявку
-              </PawButton>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <BookingModal
+        open={isBookingOpen}
+        onOpenChange={setIsBookingOpen}
+        bookingForm={bookingForm}
+        onBookingChange={handleBookingChange}
+        onSubmit={handleBookingSubmit}
+        success={bookingSuccess}
+        onSuccessClose={handleSuccessClose}
+      />
 
       <ContactSection />
     </main>
