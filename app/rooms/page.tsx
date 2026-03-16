@@ -321,15 +321,26 @@ export default function RoomsPage() {
           </aside>
 
           {/* Сітка кімнат */}
-          <div className="grow grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
-            {sortedAndFilteredRooms.map((room) => {
-              return (
-                <div key={room.id} className="h-full  md:max-w-90 w-full">
-                  <RoomCard room={room} onBook={openBookingModal} />
-                </div>
-              );
-            })}
-          </div>
+          {sortedAndFilteredRooms.length === 0 ? (
+            <div className="grow flex flex-col items-center justify-center py-20">
+              <div className="text-center">
+                <p className="text-lg font-semibold text-[#1A202C]">
+                  За вашим запитом нічого не знайдено
+                </p>
+                <p className="mt-2 text-sm text-[#6B7280]">Спробуйте змінити фільтри</p>
+              </div>
+            </div>
+          ) : (
+            <div className="grow grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+              {sortedAndFilteredRooms.map((room) => {
+                return (
+                  <div key={room.id} className="h-full  md:max-w-90 w-full">
+                    <RoomCard room={room} onBook={openBookingModal} />
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 
