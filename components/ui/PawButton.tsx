@@ -30,6 +30,7 @@ interface PawButtonProps {
   children: ReactNode;
   variant?: PawVariant;
   onClick?: () => void;
+  type?: 'button' | 'submit' | 'reset';
 }
 
 export const PawButton = ({
@@ -37,12 +38,13 @@ export const PawButton = ({
   children,
   onClick,
   variant = 'default',
+  type = 'button',
 }: PawButtonProps) => {
   const style = variants[variant];
 
   return (
     <button
-      type="button"
+      type={type}
       onClick={onClick}
       className={cn(
         'flex items-center justify-between gap-4 rounded-full p-2 pl-6 font-medium shadow cursor-pointer transition-transform duration-300 ease-out hover:scale-[1.03] active:scale-95',

@@ -16,9 +16,10 @@ export interface Room {
 
 interface RoomCardProps {
   room: Room;
+  onBook?: (room: Room) => void;
 }
 
-export function RoomCard({ room }: RoomCardProps) {
+export function RoomCard({ room, onBook }: RoomCardProps) {
   return (
     <div className="bg-white rounded-[8px] shadow-[0px_4px_20px_rgba(0,0,0,0.03)] border border-gray-100 flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-md">
       <div className="relative h-50 w-full">
@@ -35,13 +36,13 @@ export function RoomCard({ room }: RoomCardProps) {
         <h3 className="text-xl font-bold mb-3">{room.title}</h3>
 
         <div className="space-y-2 text-sm mb-6 grow">
-          <p>Розміри (ШхГхВ) — {room.size} см</p>
-          <p>Площа — {room.area.toString().replace('.', ',')} м2</p>
+          <p>Розміри (Ш×Г×В): {room.size} см</p>
+          <p>Площа: {room.area.toString().replace('.', ',')} м2</p>
 
           <div className="flex items-center gap-2">
-            <span>Оснащення номера — </span>
+            <span>Оснащення номера:</span>
             <div className="flex gap-1.5 items-center">
-              {room.equipment.map((item: string) => {
+              {room.equipment.map((item) => {
                 return (
                   <div key={item} className="relative w-5 h-5 opacity-50">
                     <Image
@@ -59,9 +60,17 @@ export function RoomCard({ room }: RoomCardProps) {
           <p className="text-lg font-bold mt-4">Ціна за добу: {room.price}₴</p>
         </div>
 
-        <PawButton variant="accent" className="w-full bg-brand-orange text-white">
-          Забронювати
-        </PawButton>
+        <div className="pt-8 flex justify-center">
+          <PawButton
+            variant="accent"
+            className=""
+            onClick={() => {
+              if (onBook) onBook(room);
+            }}
+          >
+            Забронювати
+          </PawButton>
+        </div>
       </div>
     </div>
   );

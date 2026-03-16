@@ -32,7 +32,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ua" className={cn('font-sans', inter.variable)}>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased pt-20`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased pt-20`}
+        suppressHydrationWarning
+      >
         <Header />
         <main className="bg-[#FFFDFB]">{children}</main>
         <Footer />

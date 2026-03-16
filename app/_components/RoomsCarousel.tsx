@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { type BookingFormState, BookingModal } from '@/components/shared/BookingModal';
 import {
   Carousel,
   type CarouselApi,
@@ -24,58 +25,64 @@ const ROOMS: Room[] = [
   {
     title: 'Економ плюс',
     image: '/rooms/economy-plus.jpg',
-    features: ['Площа — 0,90 м²', 'Розміри (ШхГхВ) — 90х100х180 см', 'Ціна за добу: 200₽'],
+    features: ['Площа: 0,90 м²', 'Розміри (ШхГхВ): 90х100х180 см', 'Ціна за добу: 200₴'],
   },
   {
     title: 'Комфорт',
     image: '/rooms/comfort.jpg',
-    features: ['Площа — 1,50 м²', 'Розміри (ШхГхВ) — 120x100x180 см', 'Ціна за добу: 500₽'],
+    features: ['Площа: 1,50 м²', 'Розміри (ШхГхВ): 120x100x180 см', 'Ціна за добу: 500₴'],
   },
   {
     title: 'Люкс',
     image: '/rooms/lux.jpg',
-    features: ['Площа — 2,50 м²', 'Розміри (ШхГхВ) — 150x120x180 см', 'Ціна за добу: 800₽'],
+    features: ['Площа: 2,50 м²', 'Розміри (ШхГхВ): 150x120x180 см', 'Ціна за добу: 800₴'],
   },
 ];
 
-const RoomCard = React.memo(({ room, isPriority }: { room: Room; isPriority: boolean }) => {
-  return (
-    <div className="flex flex-col md:flex-row items-center justify-center">
-      <div className="relative w-full max-w-150 h-75 md:h-101 rounded-[10px] overflow-hidden shadow-sm z-0 shrink-0">
-        <Image
-          src={room.image}
-          alt={`Фото номеру ${room.title}`}
-          fill
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, 600px"
-          priority={isPriority}
-        />
-      </div>
+const RoomCard = React.memo(
+  ({ room, isPriority, onBook }: { room: Room; isPriority: boolean; onBook: () => void }) => {
+    return (
+      <div className="flex flex-col md:flex-row items-center justify-center">
+        <div className="relative w-full max-w-150 h-75 md:h-101 rounded-[10px] overflow-hidden shadow-sm z-0 shrink-0">
+          <Image
+            src={room.image}
+            alt={`Фото номеру ${room.title}`}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 600px"
+            priority={isPriority}
+          />
+        </div>
 
-      <div className="relative z-10 bg-white p-6 md:p-10 rounded-[8px] border border-gray-50 -mt-15 md:mt-0 md:-ml-25 w-[95%] md:w-125 md:h-71 flex flex-col justify-center">
-        <div className="md:max-w-70.75">
-          <h3 className="text-xl md:text-2xl font-bold  mb-4">{room.title}</h3>
+        <div className="relative z-10 bg-white p-6 md:p-10 rounded-[8px] border border-gray-50 -mt-15 md:mt-0 md:-ml-25 w-[95%] md:w-125 md:h-71 flex flex-col justify-center">
+          <div className="md:max-w-70.75">
+            <h3 className="text-xl md:text-2xl font-bold  mb-4">{room.title}</h3>
 
-          <ul className="space-y-2 mb-6">
-            {room.features.map((feature) => {
-              return (
-                <li key={feature} className="flex items-center gap-3 text-gray-600 text-[14px]">
-                  <span className="w-2 h-2 rounded-full bg-brand-yellow shrink-0" />
-                  {feature}
-                </li>
-              );
-            })}
-          </ul>
+            <ul className="space-y-2 mb-6">
+              {room.features.map((feature) => {
+                return (
+                  <li key={feature} className="flex items-center gap-3 text-gray-600 text-[14px]">
+                    <span className="w-2 h-2 rounded-full bg-brand-yellow shrink-0" />
+                    {feature}
+                  </li>
+                );
+              })}
+            </ul>
 
-          <PawButton variant="accent" className="bg-brand-orange text-white py-2 shadow-lg">
-            Забронювати
-          </PawButton>
+            <PawButton
+              type="button"
+              variant="accent"
+              className="bg-brand-orange text-white py-2 shadow-lg"
+              onClick={onBook}
+            >
+              Забронювати
+            </PawButton>
+          </div>
         </div>
       </div>
-    </div>
-  );
-});
-
+    );
+  },
+);
 RoomCard.displayName = 'RoomCard';
 
 const Dots = React.memo(
@@ -116,6 +123,46 @@ Dots.displayName = 'Dots';
 export function RoomsCarousel() {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
+
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [bookingForm, setBookingForm] = useState<BookingFormState>({
+    name: '',
+    pet: '',
+    phone: '',
+    email: '',
+    dateFrom: '',
+    dateTo: '',
+  });
+
+  const openBookingModal = useCallback(() => {
+    setBookingSuccess(false);
+    setBookingForm({
+      name: '',
+      pet: '',
+      phone: '',
+      email: '',
+      dateFrom: '',
+      dateTo: '',
+    });
+    setIsBookingOpen(true);
+  }, []);
+
+  const closeBookingModal = useCallback(() => {
+    setIsBookingOpen(false);
+    setBookingSuccess(false);
+  }, []);
+
+  const handleBookingChange = useCallback((field: keyof BookingFormState, value: string) => {
+    setBookingForm((prev) => {
+      return { ...prev, [field]: value };
+    });
+  }, []);
+
+  const handleBookingSubmit = useCallback((event: React.FormEvent) => {
+    event.preventDefault();
+    setBookingSuccess(true);
+  }, []);
 
   useEffect(() => {
     if (!api) return;
@@ -174,7 +221,7 @@ export function RoomsCarousel() {
               {ROOMS.map((room, index) => {
                 return (
                   <CarouselItem key={room.title} className="basis-full">
-                    <RoomCard room={room} isPriority={index === 0} />
+                    <RoomCard room={room} isPriority={index === 0} onBook={openBookingModal} />
                   </CarouselItem>
                 );
               })}
@@ -190,6 +237,22 @@ export function RoomsCarousel() {
             </div>
           </Carousel>
         </div>
+
+        <BookingModal
+          open={isBookingOpen}
+          onOpenChange={(open) => {
+            if (!open) {
+              closeBookingModal();
+            } else {
+              setIsBookingOpen(open);
+            }
+          }}
+          bookingForm={bookingForm}
+          onBookingChange={handleBookingChange}
+          onSubmit={handleBookingSubmit}
+          success={bookingSuccess}
+          onSuccessClose={closeBookingModal}
+        />
       </div>
     </section>
   );

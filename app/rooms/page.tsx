@@ -1,13 +1,24 @@
 'use client';
 
-import { ChevronDown } from 'lucide-react';
-import Image from 'next/image';
+import { ChevronDown, Filter } from 'lucide-react';
+import { useCallback, useMemo, useState } from 'react';
 
-import { PawButton } from '@/components/ui/PawButton';
+import { type BookingFormState, BookingModal } from '@/components/shared/BookingModal';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 import { ContactSection } from '../_components/ContactSection';
+import { type FiltersConfig, FiltersPanel, type FiltersState } from './_components/FiltersPanel';
+import { type Room, RoomCard } from './_components/RoomCard';
 
-const ROOMS = [
+// --- Строго типізовані константи ---
+
+export const ROOMS: Room[] = [
   {
     id: '1',
     title: 'Економ',
@@ -64,130 +75,284 @@ const ROOMS = [
   },
 ];
 
-function RoomCard({ room }: { room: (typeof ROOMS)[0] }) {
+export const AMENITIES = [
+  { label: 'Пустий номер', id: 'none' },
+  { label: 'Лежак', id: 'bed' },
+  { label: 'Кігтеточка', id: 'scratcher' },
+  { label: 'Ігровий комплекс', id: 'toy' },
+  { label: 'Будиночок', id: 'house' },
+] as const;
+
+export const AREAS = ['0,63 м2', '0,90 м2', '1,13 м2', '1,56 м2', '2,56 м2', '2,88 м2'] as const;
+
+type SortOption = 'area-asc' | 'area-desc' | 'price-asc' | 'price-desc';
+
+const DEFAULT_FILTERS: FiltersState = {
+  priceMin: '',
+  priceMax: '',
+  areas: [],
+  amenities: [],
+};
+
+const SORT_LABELS: Record<SortOption, string> = {
+  'area-asc': '↑ По площі',
+  'area-desc': '↓ По площі',
+  'price-asc': '↑ По ціні',
+  'price-desc': '↓ По ціні',
+};
+
+const FILTERS_CONFIG: FiltersConfig = {
+  areas: AREAS,
+  amenities: AMENITIES,
+};
+
+// --- Хук бізнес-логіки ---
+
+function useRoomFilters() {
+  const [sort, setSort] = useState<SortOption>('area-asc');
+  const [draftFilters, setDraftFilters] = useState<FiltersState>(DEFAULT_FILTERS);
+  const [appliedFilters, setAppliedFilters] = useState<FiltersState>(DEFAULT_FILTERS);
+
+  const handleApply = useCallback(() => {
+    setAppliedFilters(draftFilters);
+  }, [draftFilters]);
+
+  const handleReset = useCallback(() => {
+    setDraftFilters(DEFAULT_FILTERS);
+    setAppliedFilters(DEFAULT_FILTERS);
+  }, []);
+
+  const sortedAndFilteredRooms = useMemo(() => {
+    const filteredRooms = ROOMS.filter((room, index) => {
+      const min = Number(appliedFilters.priceMin);
+      const max = Number(appliedFilters.priceMax);
+
+      if (!Number.isNaN(min) && appliedFilters.priceMin.trim() !== '' && room.price < min)
+        return false;
+      if (!Number.isNaN(max) && appliedFilters.priceMax.trim() !== '' && room.price > max)
+        return false;
+      if (appliedFilters.areas.length > 0 && !appliedFilters.areas.includes(index)) return false;
+
+      if (appliedFilters.amenities.length > 0) {
+        if (
+          !appliedFilters.amenities.every((amenityId) => {
+            return room.equipment.includes(amenityId);
+          })
+        ) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+    return filteredRooms.sort((a, b) => {
+      switch (sort) {
+        case 'area-asc':
+          return a.area - b.area;
+        case 'area-desc':
+          return b.area - a.area;
+        case 'price-asc':
+          return a.price - b.price;
+        case 'price-desc':
+          return b.price - a.price;
+        default:
+          return 0;
+      }
+    });
+  }, [appliedFilters, sort]);
+
+  return {
+    sort,
+    setSort,
+    draftFilters,
+    setDraftFilters,
+    handleApply,
+    handleReset,
+    sortedAndFilteredRooms,
+  };
+}
+
+// --- Головний UI компонент ---
+
+export default function RoomsPage() {
+  const {
+    sort,
+    setSort,
+    draftFilters,
+    setDraftFilters,
+    handleApply,
+    handleReset,
+    sortedAndFilteredRooms,
+  } = useRoomFilters();
+
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+
+  const [bookingForm, setBookingForm] = useState<BookingFormState>({
+    name: '',
+    pet: '',
+    phone: '',
+    email: '',
+    dateFrom: '',
+    dateTo: '',
+  });
+
+  const openBookingModal = (room: Room) => {
+    setSelectedRoom(room);
+    setBookingSuccess(false);
+    setBookingForm({
+      name: '',
+      pet: '',
+      phone: '',
+      email: '',
+      dateFrom: '',
+      dateTo: '',
+    });
+    setIsBookingOpen(true);
+  };
+
+  const closeBookingModal = () => {
+    setIsBookingOpen(false);
+    setBookingSuccess(false);
+    setSelectedRoom(null);
+  };
+
+  const handleSuccessClose = () => {
+    closeBookingModal();
+  };
+
+  const handleBookingChange = (field: keyof typeof bookingForm, value: string) => {
+    setBookingForm((prev) => {
+      return { ...prev, [field]: value };
+    });
+  };
+
+  const handleBookingSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    setBookingSuccess(true);
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden flex flex-col h-full hover:shadow-md transition-all duration-300">
-      <div className="relative h-55 w-full">
-        <Image src={room.image} alt={room.title} fill className="object-cover" />
-      </div>
+    <main className="min-h-screen bg-[#FDFBF7]">
+      <div className="max-w-7xl mx-auto px-4 pt-10 pb-24">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
+          <h1 className="text-4xl font-bold text-[#1A202C]">Наші номери</h1>
 
-      <div className="p-6 flex flex-col grow">
-        <h3 className="text-xl font-bold mb-4">{room.title}</h3>
+          <div className="flex items-center justify-between w-full md:w-auto">
+            {/* Мобільний фільтр */}
+            <div className="md:hidden">
+              <Sheet>
+                <SheetTrigger
+                  nativeButton={false}
+                  render={(props) => {
+                    return (
+                      <div
+                        {...props}
+                        role="button"
+                        tabIndex={0}
+                        className="flex items-center justify-center gap-2 bg-white h-12 px-6 rounded-full border border-gray-100 text-[16px] shadow-sm hover:bg-gray-50 transition-colors whitespace-nowrap text-[#1A202C]"
+                      >
+                        <Filter size={18} className="text-brand-orange" />
+                        <span>Фільтри</span>
+                      </div>
+                    );
+                  }}
+                />
+                <SheetContent
+                  side="left"
+                  className="w-[92%] sm:max-w-105 p-8 overflow-y-auto border-none shadow-2xl"
+                >
+                  <SheetHeader className="text-left mb-10">
+                    <SheetTitle className="text-2xl font-bold text-[#1A202C]">Параметри</SheetTitle>
+                  </SheetHeader>
+                  <div className="pb-10">
+                    <FiltersPanel
+                      config={FILTERS_CONFIG}
+                      draftFilters={draftFilters}
+                      onDraftFiltersChange={setDraftFilters}
+                      onApply={handleApply}
+                      onReset={handleReset}
+                    />
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
 
-        <div className="space-y-1.5 mb-6 text-sm grow">
-          <p className="opacity-80">Розміри (ШхГхВ) — {room.size} см</p>
-          <p className="opacity-80">Площа — {room.area.toFixed(2).replace('.', ',')} м2</p>
+            {/* Дропдаун сортування */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center justify-center gap-2 bg-white h-12 px-6 rounded-full border border-gray-100 text-[16px] shadow-sm hover:bg-gray-50 transition-colors whitespace-nowrap text-[#1A202C] focus:outline-none">
+                <span>{SORT_LABELS[sort]}</span>
+                <ChevronDown size={18} />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="bg-white rounded-xl shadow-lg border border-gray-100 p-2"
+              >
+                {(Object.entries(SORT_LABELS) as [SortOption, string][]).map(([key, label]) => {
+                  return (
+                    <DropdownMenuItem
+                      key={key}
+                      onClick={() => {
+                        return setSort(key);
+                      }}
+                      className="cursor-pointer text-[15px] hover:bg-gray-50 rounded-lg"
+                    >
+                      {label}
+                    </DropdownMenuItem>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
 
-          <div className="flex items-center gap-2">
-            <span className="opacity-80">Оснащення номера</span>
-            <div className="flex gap-1.5">
-              {room.equipment.map((item) => {
+        <div className="flex flex-col md:flex-row items-start gap-12">
+          {/* Десктопний сайдбар */}
+          <aside className="hidden md:block w-64 shrink-0">
+            <FiltersPanel
+              config={FILTERS_CONFIG}
+              draftFilters={draftFilters}
+              onDraftFiltersChange={setDraftFilters}
+              onApply={handleApply}
+              onReset={handleReset}
+            />
+          </aside>
+
+          {/* Сітка кімнат */}
+          {sortedAndFilteredRooms.length === 0 ? (
+            <div className="grow flex flex-col items-center justify-center py-20">
+              <div className="text-center">
+                <p className="text-lg font-semibold text-[#1A202C]">
+                  За вашим запитом нічого не знайдено
+                </p>
+                <p className="mt-2 text-sm text-[#6B7280]">Спробуйте змінити фільтри</p>
+              </div>
+            </div>
+          ) : (
+            <div className="grow grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+              {sortedAndFilteredRooms.map((room) => {
                 return (
-                  <Image
-                    key={item}
-                    src={`/amenities/${item}.svg`}
-                    alt={item}
-                    width={16}
-                    height={16}
-                    className="w-4 h-4 opacity-50 object-contain"
-                  />
+                  <div key={room.id} className="h-full  md:max-w-90 w-full">
+                    <RoomCard room={room} onBook={openBookingModal} />
+                  </div>
                 );
               })}
             </div>
-          </div>
-
-          <p className="pt-2 text-[16px]">
-            Ціна за добу: <span className="font-bold">{room.price}₴</span>
-          </p>
-        </div>
-
-        <PawButton variant="accent">Забронювати</PawButton>
-      </div>
-    </div>
-  );
-}
-
-export default function RoomsPage() {
-  return (
-    <main className="min-h-screen">
-      <div className="max-w-300 mx-auto px-4 pt-32 pb-24">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
-          <h1 className="text-4xl font-bold">Наші номери</h1>
-          <div className="relative">
-            <button className="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-gray-100 text-sm shadow-sm hover:bg-gray-50 transition-colors">
-              ↑ По площі <ChevronDown size={16} />
-            </button>
-          </div>
-        </div>
-
-        <div className="flex flex-col md:flex-row gap-12">
-          <aside className="w-full md:w-62.5 shrink-0 space-y-10">
-            <div>
-              <h4 className="font-bold mb-4">Ціна за добу, ₴</h4>
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  placeholder="від 100"
-                  className="w-full bg-white border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-[#FAC663]"
-                />
-                <input
-                  type="text"
-                  placeholder="до 600"
-                  className="w-full bg-white border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-[#FAC663]"
-                />
-              </div>
-            </div>
-
-            <div>
-              <h4 className="font-bold mb-4">Площа</h4>
-              <div className="space-y-2">
-                {['0,63 м2', '0,90 м2', '1,13 м2', '1,56 м2', '2,56 м2', '2,88 м2'].map((area) => {
-                  return (
-                    <label key={area} className="flex items-center gap-3 cursor-pointer text-sm">
-                      <input
-                        type="checkbox"
-                        className="w-4 h-4 accent-brand-yellow"
-                        defaultChecked
-                      />
-                      {area}
-                    </label>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div>
-              <h4 className="font-bold mb-4">Оснащення номера</h4>
-              <div className="space-y-2">
-                {[
-                  { label: 'Пустий номер', id: 'none' },
-                  { label: 'Лежак', id: 'bed' },
-                  { label: 'Кігтеточка', id: 'scratcher' },
-                  { label: 'Ігровий комплекс', id: 'toy' },
-                  { label: 'Будиночок', id: 'house' },
-                ].map((item) => {
-                  return (
-                    <label key={item.id} className="flex items-center gap-3 cursor-pointer text-sm">
-                      <input type="checkbox" className="w-4 h-4 accent-[#FAC663]" defaultChecked />
-                      {item.label}
-                    </label>
-                  );
-                })}
-              </div>
-            </div>
-
-            <button className="w-full py-3 border border-[#FAC663] rounded-md text-sm font-semibold hover:bg-[#FAC663] hover:text-white transition-all">
-              Скинути фільтр
-            </button>
-          </aside>
-
-          <div className="grow grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {ROOMS.map((room) => {
-              return <RoomCard key={room.id} room={room} />;
-            })}
-          </div>
+          )}
         </div>
       </div>
+
+      <BookingModal
+        open={isBookingOpen}
+        onOpenChange={setIsBookingOpen}
+        bookingForm={bookingForm}
+        onBookingChange={handleBookingChange}
+        onSubmit={handleBookingSubmit}
+        success={bookingSuccess}
+        onSuccessClose={handleSuccessClose}
+      />
 
       <ContactSection />
     </main>

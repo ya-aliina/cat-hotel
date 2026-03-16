@@ -1,8 +1,17 @@
+'use client';
+
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 import { PawButton } from '@/components/ui/PawButton';
 
 const Hero = () => {
+  const router = useRouter();
+
+  const handleBookClick = () => {
+    router.push('/rooms');
+  };
+
   return (
     <section className="relative w-full overflow-hidden">
       <div className="relative w-full min-h-137.5 sm:h-128">
@@ -30,7 +39,9 @@ const Hero = () => {
                 Затишний готель для котів і кішок
               </p>
               <div className="w-full sm:w-auto">
-                <PawButton className="mx-auto sm:mx-0">Забронювати</PawButton>
+                <PawButton className="mx-auto sm:mx-0" onClick={handleBookClick}>
+                  Забронювати
+                </PawButton>
               </div>
             </div>
           </div>
