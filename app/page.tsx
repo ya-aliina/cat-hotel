@@ -7,12 +7,12 @@ import { ReviewsCarousel } from './_components/ReviewsCarousel';
 
 export default function Home() {
   return (
-    <div className="">
+    <>
       <Hero />
       <Features />
       <RoomsCarousel />
       <ReviewsCarousel />
       <ContactSection />
-    </div>
+    </>
   );
 }

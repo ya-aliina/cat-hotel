@@ -44,7 +44,7 @@ const LoginForm = ({ onSwitch }: { onSwitch: (mode: AuthMode) => void }) => {
         </button>
       </div>
       <div className="pt-8 flex justify-center">
-        <PawButton variant="accent" className="min-w-48 bg-brand-orange text-white">
+        <PawButton variant="accent" className="min-w-48 text-white">
           Увійти
         </PawButton>
       </div>
