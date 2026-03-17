@@ -127,7 +127,7 @@ export function ReviewsCarousel() {
   );
 
   return (
-    <section className="w-full relative overflow-hidden py-16 md:py-24">
+    <section id="reviews" className="w-full relative overflow-hidden py-16 md:py-24 scroll-mt-24">
       <div className="absolute top-3 -right-10 md:top-3 md:right-0 lg:-right-5 z-0 pointer-events-none rotate-[-15deg]">
         <Image
           src="/paw.svg"

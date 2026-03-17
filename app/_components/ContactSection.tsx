@@ -4,7 +4,7 @@ import { contactItems, socialLinks } from '../_data/contacts';
 
 export function ContactSection() {
   return (
-    <section className="w-full bg-[#E5E3DF] overflow-hidden">
+    <section id="contacts" className="w-full bg-[#E5E3DF] overflow-hidden scroll-mt-24">
       <div className="grid grid-cols-1 md:grid-cols-[1fr_minmax(0,500px)_minmax(0,780px)_1fr] h-auto md:h-125">
         <div className="hidden md:block col-start-1 col-end-3 row-start-1 bg-brand-yellow" />
 

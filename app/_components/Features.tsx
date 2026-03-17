@@ -5,7 +5,7 @@ import { FEATURES_DATA } from '../_data/features';
 
 const Features = memo(() => {
   return (
-    <section className="relative overflow-hidden pt-20">
+    <section id="why-us" className="relative overflow-hidden pt-20 scroll-mt-24">
       <div className="absolute top-5 right-0 z-0 pointer-events-none rotate-25 ">
         <Image
           src="/paw.svg"

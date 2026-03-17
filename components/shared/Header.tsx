@@ -10,6 +10,13 @@ import { PawLink } from '@/components/ui/PawLink';
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
 
+  const aboutLinks = [
+    { title: 'Чому ми', href: '/#why-us' },
+    { title: 'Номери', href: '/#rooms' },
+    { title: 'Як нас знайти', href: '/#contacts' },
+    { title: 'Відгуки', href: '/#reviews' },
+  ];
+
   const navLinks = [
     { title: 'Про нас', href: '/' },
     { title: 'Номери', href: '/rooms' },
@@ -39,7 +46,29 @@ const Header = () => {
 
           {/* Desktop навігація */}
           <nav className="hidden md:flex items-center space-x-6 lg:space-x-10">
-            {navLinks.map((link) => {
+            <div className="relative group/about-menu">
+              <PawLink href={navLinks[0].href}>{navLinks[0].title}</PawLink>
+
+              <div className="absolute left-0 top-full pt-3 opacity-0 invisible translate-y-1 transition-all duration-200 group-hover/about-menu:opacity-100 group-hover/about-menu:visible group-hover/about-menu:translate-y-0">
+                <div className="min-w-52 rounded-xl border border-gray-100 bg-white p-3 shadow-lg">
+                  <div className="flex flex-col gap-1">
+                    {aboutLinks.map((link) => {
+                      return (
+                        <Link
+                          key={link.title}
+                          href={link.href}
+                          className="rounded-lg px-3 py-2 text-[15px] font-medium text-[#1A202C] transition-colors hover:text-brand-orange hover:bg-gray-50"
+                        >
+                          {link.title}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {navLinks.slice(1).map((link) => {
               return (
                 <PawLink key={link.title} href={link.href}>
                   {link.title}

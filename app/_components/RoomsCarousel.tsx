@@ -157,7 +157,7 @@ export function RoomsCarousel() {
   );
 
   return (
-    <section className="w-full relative overflow-hidden py-10 md:pt-20">
+    <section id="rooms" className="w-full relative overflow-hidden py-10 md:pt-20 scroll-mt-24">
       <div className="max-w-250 mx-auto px-4 relative z-0">
         <div className="absolute top-7.5 left-0 md:top-0 md:-left-65 z-[-1] w-87.5 md:w-125 pointer-events-none opacity-30">
           <svg
