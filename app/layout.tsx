@@ -32,18 +32,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <>
-      <html lang="ua" className={cn('font-sans', inter.variable)}>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased pt-20`}
-          suppressHydrationWarning
-        >
-          <Header />
-          <main className="bg-[#FFFDFB]">{children}</main>
-          <Footer />
-        </body>
-      </html>
-      <Analytics />
-    </>
+    <html lang="ua" className={cn('font-sans', inter.variable)}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased pt-20`}
+        suppressHydrationWarning
+      >
+        <Header />
+        <main className="bg-[#FFFDFB]">{children}</main>
+        <Footer />
+        <Analytics />
+      </body>
+    </html>
   );
 }
