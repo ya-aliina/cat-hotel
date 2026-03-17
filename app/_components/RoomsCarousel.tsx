@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { type BookingFormState, BookingModal } from '@/components/shared/BookingModal';
+import { BookingModal } from '@/components/shared/BookingModal';
 import {
   Carousel,
   type CarouselApi,
@@ -15,32 +15,18 @@ import {
 import { PawButton } from '@/components/ui/PawButton';
 import { cn } from '@/lib/utils';
 
-export type Room = {
-  title: string;
-  image: string;
-  features: string[];
-};
-
-const ROOMS: Room[] = [
-  {
-    title: 'Економ плюс',
-    image: '/rooms/economy-plus.jpg',
-    features: ['Площа: 0,90 м²', 'Розміри (ШхГхВ): 90х100х180 см', 'Ціна за добу: 200₴'],
-  },
-  {
-    title: 'Комфорт',
-    image: '/rooms/comfort.jpg',
-    features: ['Площа: 1,50 м²', 'Розміри (ШхГхВ): 120x100x180 см', 'Ціна за добу: 500₴'],
-  },
-  {
-    title: 'Люкс',
-    image: '/rooms/lux.jpg',
-    features: ['Площа: 2,50 м²', 'Розміри (ШхГхВ): 150x120x180 см', 'Ціна за добу: 800₴'],
-  },
-];
+import { CAROUSEL_ROOMS, type CarouselRoom } from '../_data/carousel-rooms';
 
 const RoomCard = React.memo(
-  ({ room, isPriority, onBook }: { room: Room; isPriority: boolean; onBook: () => void }) => {
+  ({
+    room,
+    isPriority,
+    onBook,
+  }: {
+    room: CarouselRoom;
+    isPriority: boolean;
+    onBook: () => void;
+  }) => {
     return (
       <div className="flex flex-col md:flex-row items-center justify-center">
         <div className="relative w-full max-w-150 h-75 md:h-101 rounded-[10px] overflow-hidden shadow-sm z-0 shrink-0">
@@ -126,25 +112,9 @@ export function RoomsCarousel() {
 
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
-  const [bookingForm, setBookingForm] = useState<BookingFormState>({
-    name: '',
-    pet: '',
-    phone: '',
-    email: '',
-    dateFrom: '',
-    dateTo: '',
-  });
 
   const openBookingModal = useCallback(() => {
     setBookingSuccess(false);
-    setBookingForm({
-      name: '',
-      pet: '',
-      phone: '',
-      email: '',
-      dateFrom: '',
-      dateTo: '',
-    });
     setIsBookingOpen(true);
   }, []);
 
@@ -153,14 +123,7 @@ export function RoomsCarousel() {
     setBookingSuccess(false);
   }, []);
 
-  const handleBookingChange = useCallback((field: keyof BookingFormState, value: string) => {
-    setBookingForm((prev) => {
-      return { ...prev, [field]: value };
-    });
-  }, []);
-
-  const handleBookingSubmit = useCallback((event: React.FormEvent) => {
-    event.preventDefault();
+  const handleBookingSubmit = useCallback(() => {
     setBookingSuccess(true);
   }, []);
 
@@ -218,7 +181,7 @@ export function RoomsCarousel() {
         <div className="relative z-10">
           <Carousel setApi={setApi} opts={carouselOpts} className="w-full">
             <CarouselContent>
-              {ROOMS.map((room, index) => {
+              {CAROUSEL_ROOMS.map((room, index) => {
                 return (
                   <CarouselItem key={room.title} className="basis-full">
                     <RoomCard room={room} isPriority={index === 0} onBook={openBookingModal} />
@@ -228,7 +191,7 @@ export function RoomsCarousel() {
             </CarouselContent>
 
             <div className="flex items-center justify-between mt-8 relative min-h-12">
-              <Dots count={ROOMS.length} current={current} onDotClick={handleDotClick} />
+              <Dots count={CAROUSEL_ROOMS.length} current={current} onDotClick={handleDotClick} />
 
               <div className="hidden md:flex gap-4 ml-auto">
                 <CarouselPrevious className="static h-12 w-12 translate-y-0 border-none bg-white shadow-sm hover:bg-brand-yellow hover:text-white transition-all" />
@@ -247,8 +210,6 @@ export function RoomsCarousel() {
               setIsBookingOpen(open);
             }
           }}
-          bookingForm={bookingForm}
-          onBookingChange={handleBookingChange}
           onSubmit={handleBookingSubmit}
           success={bookingSuccess}
           onSuccessClose={closeBookingModal}

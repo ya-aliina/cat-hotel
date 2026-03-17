@@ -3,134 +3,16 @@
 import Image from 'next/image';
 import { useState } from 'react';
 
-import { PawButton } from '@/components/ui/PawButton';
+import { AuthMode } from '@/app/login/_types/types';
 
-type AuthMode = 'login' | 'register' | 'forgot';
+import { ForgotForm } from './_components/ForgotForm';
+import { LoginForm } from './_components/LoginForm';
+import { RegisterForm } from './_components/RegisterForm';
 
-// --- Окремі компоненти форм ---
-const LoginForm = ({ onSwitch }: { onSwitch: (mode: AuthMode) => void }) => {
-  return (
-    <>
-      <div className="space-y-5">
-        <input
-          type="email"
-          placeholder="Ваш E-mail"
-          className="w-full h-13 px-8 rounded-full border border-gray-200 focus:border-brand-yellow focus:outline-none text-[16px]"
-        />
-        <input
-          type="password"
-          placeholder="Пароль"
-          className="w-full h-13 px-8 rounded-full border border-gray-200 focus:border-brand-yellow focus:outline-none text-[16px]"
-        />
-      </div>
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 px-4 text-[16px]">
-        <button
-          type="button"
-          onClick={() => {
-            return onSwitch('forgot');
-          }}
-          className="cursor-pointer text-gray-400 hover:text-brand-orange transition-colors"
-        >
-          Забули пароль?
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            return onSwitch('register');
-          }}
-          className="cursor-pointer text-gray-400 font-medium hover:text-brand-orange transition-colors"
-        >
-          Ще немає аккаунту?
-        </button>
-      </div>
-      <div className="pt-8 flex justify-center">
-        <PawButton variant="accent" className="min-w-48 text-white">
-          Увійти
-        </PawButton>
-      </div>
-    </>
-  );
-};
-
-const RegisterForm = ({ onSwitch }: { onSwitch: (mode: AuthMode) => void }) => {
-  return (
-    <>
-      <div className="space-y-5">
-        <input
-          type="text"
-          placeholder="Ваше ім'я"
-          className="w-full h-13 px-8 rounded-full border border-gray-200 focus:border-brand-yellow focus:outline-none text-[16px]"
-        />
-        <input
-          type="email"
-          placeholder="Ваш E-mail"
-          className="w-full h-13 px-8 rounded-full border border-gray-200 focus:border-brand-yellow focus:outline-none text-[16px]"
-        />
-        <input
-          type="password"
-          placeholder="Пароль"
-          className="w-full h-13 px-8 rounded-full border border-gray-200 focus:border-brand-yellow focus:outline-none text-[16px]"
-        />
-        <input
-          type="password"
-          placeholder="Підтвердіть пароль"
-          className="w-full h-13 px-8 rounded-full border border-gray-200 focus:border-brand-yellow focus:outline-none text-[16px]"
-        />
-      </div>
-      <div className="pt-8 flex flex-col items-center gap-4">
-        <PawButton variant="accent" className="min-w-48 bg-brand-orange text-white">
-          Створити аккаунт
-        </PawButton>
-        <button
-          type="button"
-          onClick={() => {
-            return onSwitch('login');
-          }}
-          className="text-gray-400 hover:text-brand-orange text-sm font-medium transition-colors"
-        >
-          Повернутися до входу
-        </button>
-      </div>
-    </>
-  );
-};
-
-const ForgotForm = ({ onSwitch }: { onSwitch: (mode: AuthMode) => void }) => {
-  return (
-    <>
-      <div className="space-y-5">
-        <p className="text-gray-400 text-sm text-center italic mb-4">
-          Ми надішлемо інструкцію на ваш E-mail
-        </p>
-        <input
-          type="email"
-          placeholder="Ваш E-mail"
-          className="w-full h-13 px-8 rounded-full border border-gray-200 focus:border-brand-yellow focus:outline-none text-[16px]"
-        />
-      </div>
-      <div className="pt-8 flex flex-col items-center gap-4">
-        <PawButton variant="accent" className="min-w-48 bg-brand-orange text-white">
-          Надіслати
-        </PawButton>
-        <button
-          type="button"
-          onClick={() => {
-            return onSwitch('login');
-          }}
-          className="cursor-pointer text-gray-400 hover:text-brand-orange text-sm font-medium transition-colors"
-        >
-          Повернутися до входу
-        </button>
-      </div>
-    </>
-  );
-};
-
-// --- Основний компонент сторінки ---
 export default function LoginPage() {
   const [mode, setMode] = useState<AuthMode>('login');
 
-  const titles = {
+  const titles: Record<AuthMode, string> = {
     login: 'Увійти в кабінет',
     register: 'Реєстрація',
     forgot: 'Відновлення пароля',
@@ -165,15 +47,9 @@ export default function LoginPage() {
             <h1 className="text-[28px] font-bold text-[#1A202C]">{titles[mode]}</h1>
           </div>
 
-          <form
-            onSubmit={(e) => {
-              return e.preventDefault();
-            }}
-          >
-            {mode === 'login' && <LoginForm onSwitch={setMode} />}
-            {mode === 'register' && <RegisterForm onSwitch={setMode} />}
-            {mode === 'forgot' && <ForgotForm onSwitch={setMode} />}
-          </form>
+          {mode === 'login' && <LoginForm onSwitch={setMode} />}
+          {mode === 'register' && <RegisterForm onSwitch={setMode} />}
+          {mode === 'forgot' && <ForgotForm onSwitch={setMode} />}
         </div>
       </div>
 

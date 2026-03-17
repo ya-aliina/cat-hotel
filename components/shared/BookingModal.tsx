@@ -1,39 +1,108 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { XIcon } from 'lucide-react';
 import Image from 'next/image';
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/Input';
 import { PawButton } from '@/components/ui/PawButton';
 
-export type BookingFormState = {
-  name: string;
-  pet: string;
-  phone: string;
-  email: string;
-  dateFrom: string;
-  dateTo: string;
-};
+const nameField = z
+  .string()
+  .trim()
+  .min(2, 'Введіть щонайменше 2 символи')
+  .regex(/^[^\d]+$/, 'Використовуйте лише літери');
+
+export const bookingSchema = z
+  .object({
+    name: nameField,
+
+    surname: nameField,
+
+    pet: z
+      .string()
+      .trim()
+      .min(2, 'Введіть щонайменше 2 символи')
+      .regex(/^[^\d]+$/, 'Імʼя улюбленця має містити лише літери'),
+
+    phone: z
+      .string()
+      .trim()
+      .regex(/^\+?\d{10,15}$/, 'Введіть коректний номер телефону'),
+
+    email: z.string().trim().min(1, 'Введіть email').email('Введіть коректну email-адресу'),
+
+    dateFrom: z.string().min(1, 'Оберіть дату заїзду'),
+
+    dateTo: z.string().min(1, 'Оберіть дату виїзду'),
+  })
+  .refine(
+    (data) => {
+      return new Date(data.dateFrom) <= new Date(data.dateTo);
+    },
+    {
+      message: 'Дата виїзду має бути пізніше за дату заїзду',
+      path: ['dateTo'],
+    },
+  );
+
+export type BookingFormState = z.infer<typeof bookingSchema>;
 
 export type BookingModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  bookingForm: BookingFormState;
-  onBookingChange: (field: keyof BookingFormState, value: string) => void;
-  onSubmit: (event: React.FormEvent) => void;
+  onSubmit: (data: BookingFormState) => void;
   success?: boolean;
   onSuccessClose?: () => void;
 };
 
+function SuccessView({ onClose }: { onClose?: () => void }) {
+  return (
+    <div className="text-center">
+      <h1 className="text-[28px] font-bold text-[#1A202C]">Дякуємо за заявку!</h1>
+      <p className="text-base text-muted-foreground mt-2">Ми зв’яжемося з вами найближчим часом</p>
+      <div className="mt-10 flex justify-center">
+        <PawButton
+          variant="accent"
+          className="min-w-48 bg-brand-orange text-white"
+          onClick={onClose}
+        >
+          Ок
+        </PawButton>
+      </div>
+    </div>
+  );
+}
+
+// --- Головний компонент модалки ---
 export function BookingModal({
   open,
   onOpenChange,
-  bookingForm,
-  onBookingChange,
   onSubmit,
   success = false,
   onSuccessClose,
 }: BookingModalProps) {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<BookingFormState>({
+    resolver: zodResolver(bookingSchema),
+    defaultValues: {
+      name: '',
+      surname: '',
+      pet: '',
+      phone: '',
+      email: '',
+      dateFrom: '',
+      dateTo: '',
+    },
+  });
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="p-0 bg-transparent shadow-none ring-0">
@@ -52,7 +121,7 @@ export function BookingModal({
             <div className="absolute -top-4 -left-4 w-32 h-32 pointer-events-none">
               <Image
                 src="/paw.svg"
-                alt=""
+                alt="paw decorative"
                 width={128}
                 height={128}
                 className="object-contain rotate-135"
@@ -60,92 +129,77 @@ export function BookingModal({
             </div>
 
             {success ? (
-              <div className="text-center">
-                <h1 className="text-[28px] font-bold text-[#1A202C]">Дякуємо за заявку!</h1>
-                <p className="text-base text-muted-foreground mt-2">
-                  Ми зв’яжемося з вами найближчим часом
-                </p>
-
-                <div className="mt-10 flex justify-center">
-                  <PawButton
-                    variant="accent"
-                    className="min-w-48 bg-brand-orange text-white"
-                    onClick={onSuccessClose}
-                  >
-                    Ок
-                  </PawButton>
-                </div>
-              </div>
+              <SuccessView onClose={onSuccessClose} />
             ) : (
               <>
-                <div className="mb-10 text-center">
+                <div className="mb-6 text-center">
                   <h1 className="text-[28px] font-bold text-[#1A202C]">Забронювати номер</h1>
                 </div>
 
-                <form onSubmit={onSubmit} className="space-y-5">
-                  <input
-                    value={bookingForm.name}
-                    onChange={(e) => {
-                      return onBookingChange('name', e.target.value);
-                    }}
-                    type="text"
-                    placeholder="Ваше ім'я"
-                    className="w-full h-13 px-8 rounded-full border border-gray-200 focus:border-brand-yellow focus:outline-none text-[16px]"
-                  />
-                  <input
-                    value={bookingForm.pet}
-                    onChange={(e) => {
-                      return onBookingChange('pet', e.target.value);
-                    }}
-                    type="text"
-                    placeholder="Ім'я Питомця"
-                    className="w-full h-13 px-8 rounded-full border border-gray-200 focus:border-brand-yellow focus:outline-none text-[16px]"
-                  />
-                  <input
-                    value={bookingForm.phone}
-                    onChange={(e) => {
-                      return onBookingChange('phone', e.target.value);
-                    }}
-                    type="tel"
-                    placeholder="Телефон"
-                    className="w-full h-13 px-8 rounded-full border border-gray-200 focus:border-brand-yellow focus:outline-none text-[16px]"
-                  />
-                  <input
-                    value={bookingForm.email}
-                    onChange={(e) => {
-                      return onBookingChange('email', e.target.value);
-                    }}
-                    type="email"
-                    placeholder="E-mail"
-                    className="w-full h-13 px-8 rounded-full border border-gray-200 focus:border-brand-yellow focus:outline-none text-[16px]"
-                  />
-
-                  <div className="flex flex-col sm:flex-row items-center gap-4">
-                    <label className="flex items-center gap-2 text-sm">
-                      <span>Дата заїзду</span>
-                      <input
-                        value={bookingForm.dateFrom}
-                        onChange={(e) => {
-                          return onBookingChange('dateFrom', e.target.value);
-                        }}
-                        type="date"
-                        className="w-full sm:w-auto h-13 px-4 rounded-full border border-gray-200 focus:border-brand-yellow focus:outline-none text-[16px]"
-                      />
-                    </label>
-                    <label className="flex items-center gap-2 text-sm">
-                      <span>по</span>
-                      <input
-                        value={bookingForm.dateTo}
-                        onChange={(e) => {
-                          return onBookingChange('dateTo', e.target.value);
-                        }}
-                        type="date"
-                        className="w-full sm:w-auto h-13 px-4 rounded-full border border-gray-200 focus:border-brand-yellow focus:outline-none text-[16px]"
-                      />
-                    </label>
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <Input
+                      type="text"
+                      placeholder="Ім'я"
+                      {...register('name')}
+                      error={errors.name?.message}
+                      className="flex-1"
+                    />
+                    <Input
+                      type="text"
+                      placeholder="Прізвище"
+                      {...register('surname')}
+                      error={errors.surname?.message}
+                      className="flex-1"
+                    />
                   </div>
 
-                  <DialogFooter className="flex-col items-center justify-center sm:flex-row sm:justify-center">
+                  <Input
+                    type="text"
+                    placeholder="Ім'я улюбленця"
+                    {...register('pet')}
+                    error={errors.pet?.message}
+                  />
+
+                  <Input
+                    type="tel"
+                    placeholder="Телефон"
+                    {...register('phone', {
+                      onChange: (e) => {
+                        e.target.value = e.target.value.replace(/\D/g, '');
+                      },
+                    })}
+                    error={errors.phone?.message}
+                  />
+
+                  <Input
+                    type="email"
+                    placeholder="E-mail"
+                    {...register('email')}
+                    error={errors.email?.message}
+                  />
+
+                  <div className="flex flex-col sm:flex-row items-start gap-4">
+                    <div className="flex-1 w-full">
+                      <label className="flex flex-col gap-2 text-sm text-gray-600 ml-4 mb-1">
+                        Дата заїзду
+                      </label>
+                      <Input
+                        type="date"
+                        {...register('dateFrom')}
+                        error={errors.dateFrom?.message}
+                      />
+                    </div>
+
+                    <div className="flex-1 w-full">
+                      <label className="flex flex-col gap-2 text-sm text-gray-600 ml-4 mb-1">
+                        Дата виїзду
+                      </label>
+                      <Input type="date" {...register('dateTo')} error={errors.dateTo?.message} />
+                    </div>
+                  </div>
+
+                  <DialogFooter className="flex-col items-center justify-center pt-4 sm:flex-row sm:justify-center">
                     <PawButton
                       type="submit"
                       variant="accent"

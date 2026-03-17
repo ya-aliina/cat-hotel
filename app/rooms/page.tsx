@@ -1,9 +1,9 @@
 'use client';
 
 import { ChevronDown, Filter } from 'lucide-react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 
-import { type BookingFormState, BookingModal } from '@/components/shared/BookingModal';
+import { BookingModal } from '@/components/shared/BookingModal';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,86 +13,10 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 import { ContactSection } from '../_components/ContactSection';
-import { type FiltersConfig, FiltersPanel, type FiltersState } from './_components/FiltersPanel';
-import { type Room, RoomCard } from './_components/RoomCard';
-
-// --- Строго типізовані константи ---
-
-export const ROOMS: Room[] = [
-  {
-    id: '1',
-    title: 'Економ',
-    image: '/rooms/economy.jpg',
-    size: '90x70x180',
-    area: 0.63,
-    equipment: ['none'],
-    price: 100,
-  },
-  {
-    id: '2',
-    title: 'Економ плюс',
-    image: '/rooms/economy-plus.jpg',
-    size: '90x100x180',
-    area: 0.9,
-    equipment: ['bed', 'scratcher'],
-    price: 200,
-  },
-  {
-    id: '3',
-    title: 'Комфорт',
-    image: '/rooms/comfort.jpg',
-    size: '100x125x180',
-    area: 1.13,
-    equipment: ['bed', 'scratcher', 'toy'],
-    price: 250,
-  },
-  {
-    id: '4',
-    title: 'Сьют',
-    image: '/rooms/suite.jpg',
-    size: '125x125x180',
-    area: 1.56,
-    equipment: ['bed', 'scratcher', 'toy'],
-    price: 350,
-  },
-  {
-    id: '5',
-    title: 'Люкс',
-    image: '/rooms/lux.jpg',
-    size: '160x160x180',
-    area: 2.56,
-    equipment: ['bed', 'scratcher', 'toy', 'house'],
-    price: 500,
-  },
-  {
-    id: '6',
-    title: 'Супер-Люкс',
-    image: '/rooms/super-lux.jpg',
-    size: '180x160x180',
-    area: 2.88,
-    equipment: ['bed', 'scratcher', 'toy', 'house'],
-    price: 600,
-  },
-];
-
-export const AMENITIES = [
-  { label: 'Пустий номер', id: 'none' },
-  { label: 'Лежак', id: 'bed' },
-  { label: 'Кігтеточка', id: 'scratcher' },
-  { label: 'Ігровий комплекс', id: 'toy' },
-  { label: 'Будиночок', id: 'house' },
-] as const;
-
-export const AREAS = ['0,63 м2', '0,90 м2', '1,13 м2', '1,56 м2', '2,56 м2', '2,88 м2'] as const;
-
-type SortOption = 'area-asc' | 'area-desc' | 'price-asc' | 'price-desc';
-
-const DEFAULT_FILTERS: FiltersState = {
-  priceMin: '',
-  priceMax: '',
-  areas: [],
-  amenities: [],
-};
+import { type FiltersConfig, FiltersPanel } from './_components/FiltersPanel';
+import { RoomCard } from './_components/RoomCard';
+import { AMENITIES, AREAS } from './_data/rooms';
+import { type SortOption, useRoomFilters } from './_hooks/useRoomFilters';
 
 const SORT_LABELS: Record<SortOption, string> = {
   'area-asc': '↑ По площі',
@@ -105,73 +29,6 @@ const FILTERS_CONFIG: FiltersConfig = {
   areas: AREAS,
   amenities: AMENITIES,
 };
-
-// --- Хук бізнес-логіки ---
-
-function useRoomFilters() {
-  const [sort, setSort] = useState<SortOption>('area-asc');
-  const [draftFilters, setDraftFilters] = useState<FiltersState>(DEFAULT_FILTERS);
-  const [appliedFilters, setAppliedFilters] = useState<FiltersState>(DEFAULT_FILTERS);
-
-  const handleApply = useCallback(() => {
-    setAppliedFilters(draftFilters);
-  }, [draftFilters]);
-
-  const handleReset = useCallback(() => {
-    setDraftFilters(DEFAULT_FILTERS);
-    setAppliedFilters(DEFAULT_FILTERS);
-  }, []);
-
-  const sortedAndFilteredRooms = useMemo(() => {
-    const filteredRooms = ROOMS.filter((room, index) => {
-      const min = Number(appliedFilters.priceMin);
-      const max = Number(appliedFilters.priceMax);
-
-      if (!Number.isNaN(min) && appliedFilters.priceMin.trim() !== '' && room.price < min)
-        return false;
-      if (!Number.isNaN(max) && appliedFilters.priceMax.trim() !== '' && room.price > max)
-        return false;
-      if (appliedFilters.areas.length > 0 && !appliedFilters.areas.includes(index)) return false;
-
-      if (appliedFilters.amenities.length > 0) {
-        if (
-          !appliedFilters.amenities.every((amenityId) => {
-            return room.equipment.includes(amenityId);
-          })
-        ) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-
-    return filteredRooms.sort((a, b) => {
-      switch (sort) {
-        case 'area-asc':
-          return a.area - b.area;
-        case 'area-desc':
-          return b.area - a.area;
-        case 'price-asc':
-          return a.price - b.price;
-        case 'price-desc':
-          return b.price - a.price;
-        default:
-          return 0;
-      }
-    });
-  }, [appliedFilters, sort]);
-
-  return {
-    sort,
-    setSort,
-    draftFilters,
-    setDraftFilters,
-    handleApply,
-    handleReset,
-    sortedAndFilteredRooms,
-  };
-}
 
 // --- Головний UI компонент ---
 
@@ -186,53 +43,26 @@ export default function RoomsPage() {
     sortedAndFilteredRooms,
   } = useRoomFilters();
 
-  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
 
-  const [bookingForm, setBookingForm] = useState<BookingFormState>({
-    name: '',
-    pet: '',
-    phone: '',
-    email: '',
-    dateFrom: '',
-    dateTo: '',
-  });
-
-  const openBookingModal = (room: Room) => {
-    setSelectedRoom(room);
+  const openBookingModal = () => {
     setBookingSuccess(false);
-    setBookingForm({
-      name: '',
-      pet: '',
-      phone: '',
-      email: '',
-      dateFrom: '',
-      dateTo: '',
-    });
     setIsBookingOpen(true);
   };
 
   const closeBookingModal = () => {
     setIsBookingOpen(false);
     setBookingSuccess(false);
-    setSelectedRoom(null);
   };
 
   const handleSuccessClose = () => {
     closeBookingModal();
   };
 
-  const handleBookingChange = (field: keyof typeof bookingForm, value: string) => {
-    setBookingForm((prev) => {
-      return { ...prev, [field]: value };
-    });
-  };
-
-  const handleBookingSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
+  const handleBookingSubmit = useCallback(() => {
     setBookingSuccess(true);
-  };
+  }, []);
 
   return (
     <main className="min-h-screen bg-[#FDFBF7]">
@@ -346,9 +176,13 @@ export default function RoomsPage() {
 
       <BookingModal
         open={isBookingOpen}
-        onOpenChange={setIsBookingOpen}
-        bookingForm={bookingForm}
-        onBookingChange={handleBookingChange}
+        onOpenChange={(open) => {
+          if (!open) {
+            closeBookingModal();
+          } else {
+            setIsBookingOpen(open);
+          }
+        }}
         onSubmit={handleBookingSubmit}
         success={bookingSuccess}
         onSuccessClose={handleSuccessClose}

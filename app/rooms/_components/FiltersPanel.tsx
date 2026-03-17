@@ -103,7 +103,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
               >
                 <input
                   type="checkbox"
-                  className="w-5 h-5 accent-[#FAC663] rounded cursor-pointer"
+                  className="w-5 h-5 accent-brand-yellow rounded cursor-pointer"
                   checked={draftFilters.amenities.includes(item.id)}
                   onChange={(event) => {
                     onDraftFiltersChange({
@@ -126,14 +126,14 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
       <div className="flex flex-col gap-3 pt-2">
         <button
           type="button"
-          className="cursor-pointer w-full py-4 rounded-xl text-[16px] font-semibold bg-[#FAC663] text-white hover:bg-[#f7b949] transition-all"
+          className="cursor-pointer w-full py-4 rounded-xl text-[16px] font-semibold bg-brand-yellow text-white hover:bg-brand-yellow/90 transition-all"
           onClick={onApply}
         >
           Застосувати
         </button>
         <button
           type="button"
-          className="cursor-pointer w-full py-4 border border-[#FAC663] rounded-xl text-[16px] font-semibold hover:bg-[#FAC663] hover:text-white transition-all text-[#1A202C]"
+          className="cursor-pointer w-full py-4 border border-brand-yellow rounded-xl text-[16px] font-semibold hover:bg-brand-yellow hover:text-white transition-all text-[#1A202C]"
           onClick={onReset}
         >
           Скинути фільтр
