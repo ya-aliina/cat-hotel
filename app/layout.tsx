@@ -1,5 +1,6 @@
 import './globals.css';
 
+import { Analytics } from '@vercel/analytics/next';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono, Inter } from 'next/font/google';
 
@@ -31,15 +32,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ua" className={cn('font-sans', inter.variable)}>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased pt-20`}
-        suppressHydrationWarning
-      >
-        <Header />
-        <main className="bg-[#FFFDFB]">{children}</main>
-        <Footer />
-      </body>
-    </html>
+    <>
+      <html lang="ua" className={cn('font-sans', inter.variable)}>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased pt-20`}
+          suppressHydrationWarning
+        >
+          <Header />
+          <main className="bg-[#FFFDFB]">{children}</main>
+          <Footer />
+        </body>
+      </html>
+      <Analytics />
+    </>
   );
 }
