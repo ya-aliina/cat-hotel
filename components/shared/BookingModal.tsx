@@ -3,7 +3,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { XIcon } from 'lucide-react';
 import Image from 'next/image';
-import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -78,7 +77,6 @@ function SuccessView({ onClose }: { onClose?: () => void }) {
   );
 }
 
-// --- Головний компонент модалки ---
 export function BookingModal({
   open,
   onOpenChange,
@@ -105,20 +103,20 @@ export function BookingModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="p-0 bg-transparent shadow-none ring-0">
-        <div className="max-w-7xl w-full flex justify-center relative z-10">
-          <div className="w-full max-w-140 bg-white rounded-[30px] shadow-xl p-8 md:p-12 relative overflow-hidden transition-all duration-500">
+      <DialogContent className="w-[calc(100%-1.5rem)] sm:w-full max-w-140 p-0 bg-transparent shadow-none ring-0">
+        <div className="w-full flex justify-center relative z-10">
+          <div className="w-full max-h-[90vh] overflow-y-auto bg-white rounded-[24px] sm:rounded-[30px] shadow-xl p-5 sm:p-8 md:p-12 relative overflow-x-hidden transition-all duration-500">
             <button
               type="button"
               onClick={() => {
                 return onOpenChange(false);
               }}
-              className="absolute top-5 right-5 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white/70 text-gray-500 hover:bg-white hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
+              className="absolute top-4 right-4 sm:top-5 sm:right-5 flex h-9 w-9 sm:h-10 sm:w-10 cursor-pointer items-center justify-center rounded-full bg-white/70 text-gray-500 hover:bg-white hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
             >
               <XIcon className="h-5 w-5" />
             </button>
 
-            <div className="absolute -top-4 -left-4 w-32 h-32 pointer-events-none">
+            <div className="absolute -top-3 -left-3 sm:-top-4 sm:-left-4 w-24 h-24 sm:w-32 sm:h-32 pointer-events-none">
               <Image
                 src="/paw.svg"
                 alt="paw decorative"
