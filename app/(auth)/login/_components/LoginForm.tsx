@@ -1,11 +1,13 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { Input } from '@/components/ui/Input';
 import { PawButton } from '@/components/ui/PawButton';
+import { signIn } from '@/lib/auth';
 
 import type { AuthFormProps } from '../_types/types';
 
@@ -17,6 +19,8 @@ const loginSchema = z.object({
 type LoginData = z.infer<typeof loginSchema>;
 
 export const LoginForm = ({ onSwitch }: AuthFormProps) => {
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -25,9 +29,9 @@ export const LoginForm = ({ onSwitch }: AuthFormProps) => {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = (data: LoginData) => {
-    console.log('Дані логіну:', data);
-    // TODO: Запит до API для авторизації
+  const onSubmit = (_data: LoginData) => {
+    signIn();
+    router.push('/');
   };
 
   return (

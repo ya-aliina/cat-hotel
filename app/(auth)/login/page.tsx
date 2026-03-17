@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 
-import { AuthMode } from '@/app/login/_types/types';
+import { AuthMode } from '@/app/(auth)/login/_types/types';
 
 import { ForgotForm } from './_components/ForgotForm';
 import { LoginForm } from './_components/LoginForm';

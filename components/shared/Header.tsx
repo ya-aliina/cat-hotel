@@ -3,12 +3,14 @@
 import { Menu, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { PawLink } from '@/components/ui/PawLink';
+import { isAuthenticated, onAuthChange } from '@/lib/auth';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [authed, setAuthed] = useState(false);
 
   const aboutLinks = [
     { title: 'Чому ми', href: '/#why-us' },
@@ -17,11 +19,26 @@ const Header = () => {
     { title: 'Відгуки', href: '/#reviews' },
   ];
 
-  const navLinks = [
-    { title: 'Про нас', href: '/' },
-    { title: 'Номери', href: '/rooms' },
-    { title: 'Вхід', href: '/login' },
-  ];
+  const navLinks = useMemo(() => {
+    return [
+      { title: 'Про нас', href: '/' },
+      { title: 'Номери', href: '/rooms' },
+      authed ? { title: 'Акаунт', href: '/account' } : { title: 'Вхід', href: '/login' },
+    ];
+  }, [authed]);
+
+  useEffect(() => {
+    const sync = () => {
+      setAuthed(isAuthenticated());
+    };
+
+    sync();
+    const unsubscribe = onAuthChange(sync);
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
