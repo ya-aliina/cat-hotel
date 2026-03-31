@@ -13,7 +13,7 @@ export function SecuritySection() {
       id="security"
       className="bg-white rounded-[30px] border border-gray-100 shadow-sm p-6 md:p-8"
     >
-      <h2 className="text-2xl font-bold text-[#1A202C]">Безпека</h2>
+      <h2 className="text-2xl font-bold text-brand-text">Безпека</h2>
 
       <form
         className="mt-6 space-y-4"
@@ -30,7 +30,7 @@ export function SecuritySection() {
           <PawButton type="submit" variant="accent" className="bg-brand-orange text-white">
             Оновити пароль
           </PawButton>
-          {passwordSaved && <p className="text-sm text-[#16A34A]">Пароль успішно оновлено</p>}
+          {passwordSaved && <p className="text-sm text-brand-success">Пароль успішно оновлено</p>}
         </div>
       </form>
     </section>

@@ -74,7 +74,7 @@ const Header = () => {
                         <Link
                           key={link.title}
                           href={link.href}
-                          className="rounded-lg px-3 py-2 text-[15px] font-medium text-[#1A202C] transition-colors hover:text-brand-orange hover:bg-gray-50"
+                          className="rounded-lg px-3 py-2 text-[15px] font-medium text-brand-text transition-colors hover:text-brand-orange hover:bg-gray-50"
                         >
                           {link.title}
                         </Link>
@@ -98,7 +98,7 @@ const Header = () => {
           <div className="md:hidden">
             <button
               onClick={toggleMenu}
-              className="p-2 text-[#1A202C] hover:bg-gray-50 rounded-lg transition-colors"
+              className="p-2 text-brand-text hover:bg-gray-50 rounded-lg transition-colors"
             >
               {isOpen ? <X size={28} /> : <Menu size={28} />}
             </button>

@@ -13,7 +13,7 @@ export function ProfileSection() {
       id="profile"
       className="bg-white rounded-[30px] border border-gray-100 shadow-sm p-6 md:p-8"
     >
-      <h2 className="text-2xl font-bold text-[#1A202C]">Профіль</h2>
+      <h2 className="text-2xl font-bold text-brand-text">Профіль</h2>
 
       <form
         className="mt-6 space-y-4"
@@ -34,7 +34,7 @@ export function ProfileSection() {
           <PawButton type="submit" variant="accent" className="bg-brand-orange text-white">
             Зберегти зміни
           </PawButton>
-          {profileSaved && <p className="text-sm text-[#16A34A]">Дані профілю оновлено</p>}
+          {profileSaved && <p className="text-sm text-brand-success">Дані профілю оновлено</p>}
         </div>
       </form>
     </section>

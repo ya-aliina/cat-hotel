@@ -19,7 +19,7 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-[calc(100vh-80px)] bg-[#FDFBF7] flex items-center justify-center p-4 relative overflow-hidden">
+    <main className="min-h-[calc(100vh-80px)] bg-brand-surface flex items-center justify-center p-4 relative overflow-hidden">
       {/* Кот */}
       <div className="hidden min-[1000px]:block absolute left-[-5%] bottom-0 w-[70%] h-[90%] pointer-events-none z-0">
         <Image
@@ -44,7 +44,7 @@ export default function LoginPage() {
           </div>
 
           <div className="mb-10 text-center">
-            <h1 className="text-[28px] font-bold text-[#1A202C]">{titles[mode]}</h1>
+            <h1 className="text-[28px] font-bold text-brand-text">{titles[mode]}</h1>
           </div>
 
           {mode === 'login' && <LoginForm onSwitch={setMode} />}

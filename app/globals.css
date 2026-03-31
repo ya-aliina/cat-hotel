@@ -7,6 +7,17 @@
 @theme inline {
   --color-brand-orange: var(--brand-orange);
   --color-brand-yellow: var(--brand-yellow);
+  --color-brand-text: var(--brand-text);
+  --color-brand-text-muted: var(--brand-text-muted);
+  --color-brand-text-soft: var(--brand-text-soft);
+  --color-brand-text-subtle: var(--brand-text-subtle);
+  --color-brand-surface: var(--brand-surface);
+  --color-brand-surface-alt: var(--brand-surface-alt);
+  --color-brand-surface-card: var(--brand-surface-card);
+  --color-brand-border-soft: var(--brand-border-soft);
+  --color-brand-success: var(--brand-success);
+  --color-brand-cream: var(--brand-cream);
+  --color-brand-yellow-deep: var(--brand-yellow-deep);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -53,6 +64,17 @@
 :root {
   --brand-orange: #FF7043;
   --brand-yellow: #FAC663;
+  --brand-text: #1A202C;
+  --brand-text-muted: #374151;
+  --brand-text-soft: #4B5563;
+  --brand-text-subtle: #6B7280;
+  --brand-surface: #FDFBF7;
+  --brand-surface-alt: #FFFDFB;
+  --brand-surface-card: #FFFEFC;
+  --brand-border-soft: #D9D9D9;
+  --brand-success: #16A34A;
+  --brand-cream: #E5E3DF;
+  --brand-yellow-deep: #FAB751;
 
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -91,6 +113,17 @@
 .dark {
   --brand-orange: #FF7043;
   --brand-yellow: #FAC663;
+  --brand-text: #1A202C;
+  --brand-text-muted: #374151;
+  --brand-text-soft: #4B5563;
+  --brand-text-subtle: #6B7280;
+  --brand-surface: #FDFBF7;
+  --brand-surface-alt: #FFFDFB;
+  --brand-surface-card: #FFFEFC;
+  --brand-border-soft: #D9D9D9;
+  --brand-success: #16A34A;
+  --brand-cream: #E5E3DF;
+  --brand-yellow-deep: #FAB751;
 
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);

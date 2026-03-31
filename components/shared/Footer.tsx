@@ -41,7 +41,7 @@ const Footer = ({ className }: { className?: string }) => {
 
           {/* Навігація */}
           <div>
-            <h4 className="text-[#1A202C] font-bold mb-6 text-xs uppercase tracking-widest">
+            <h4 className="text-brand-text font-bold mb-6 text-xs uppercase tracking-widest">
               Навігація
             </h4>
             <ul className="space-y-3">
@@ -59,7 +59,7 @@ const Footer = ({ className }: { className?: string }) => {
 
           {/* Контакти з лапкою */}
           <div>
-            <h4 className="text-[#1A202C] font-bold mb-6 text-xs uppercase tracking-widest">
+            <h4 className="text-brand-text font-bold mb-6 text-xs uppercase tracking-widest">
               Контакти
             </h4>
             <ul className="space-y-3">
@@ -80,7 +80,7 @@ const Footer = ({ className }: { className?: string }) => {
 
           {/* Соцмережі */}
           <div>
-            <h4 className="text-[#1A202C] font-bold mb-6 text-xs uppercase tracking-widest">
+            <h4 className="text-brand-text font-bold mb-6 text-xs uppercase tracking-widest">
               Ми у соцмережах
             </h4>
             <div className="flex space-x-4">

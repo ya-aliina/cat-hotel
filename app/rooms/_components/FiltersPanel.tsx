@@ -25,7 +25,7 @@ interface FiltersPanelProps {
 const FilterSection = ({ title, children }: { title: string; children: React.ReactNode }) => {
   return (
     <section>
-      <h4 className="font-bold mb-4 text-[#1A202C]">{title}</h4>
+      <h4 className="font-bold mb-4 text-brand-text">{title}</h4>
       {children}
     </section>
   );
@@ -69,7 +69,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
             return (
               <label
                 key={area}
-                className="flex items-center gap-3 cursor-pointer text-[16px] text-[#1A202C] hover:text-brand-orange transition-colors"
+                className="flex items-center gap-3 cursor-pointer text-[16px] text-brand-text hover:text-brand-orange transition-colors"
               >
                 <input
                   type="checkbox"
@@ -99,7 +99,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
             return (
               <label
                 key={item.id}
-                className="flex items-center gap-3 cursor-pointer text-[16px] text-[#1A202C] hover:text-brand-orange transition-colors"
+                className="flex items-center gap-3 cursor-pointer text-[16px] text-brand-text hover:text-brand-orange transition-colors"
               >
                 <input
                   type="checkbox"
@@ -133,7 +133,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
         </button>
         <button
           type="button"
-          className="cursor-pointer w-full py-4 border border-brand-yellow rounded-xl text-[16px] font-semibold hover:bg-brand-yellow hover:text-white transition-all text-[#1A202C]"
+          className="cursor-pointer w-full py-4 border border-brand-yellow rounded-xl text-[16px] font-semibold hover:bg-brand-yellow hover:text-white transition-all text-brand-text"
           onClick={onReset}
         >
           Скинути фільтр

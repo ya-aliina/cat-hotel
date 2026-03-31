@@ -65,10 +65,10 @@ export default function RoomsPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#FDFBF7]">
+    <main className="min-h-screen bg-brand-surface">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-24">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
-          <h1 className="text-4xl font-bold text-[#1A202C]">Наші номери</h1>
+          <h1 className="text-4xl font-bold text-brand-text">Наші номери</h1>
 
           <div className="flex items-center justify-between w-full md:w-auto">
             {/* Мобільний фільтр */}
@@ -82,7 +82,7 @@ export default function RoomsPage() {
                         {...props}
                         role="button"
                         tabIndex={0}
-                        className="flex items-center justify-center gap-2 bg-white h-12 px-6 rounded-full border border-gray-100 text-[16px] shadow-sm hover:bg-gray-50 transition-colors whitespace-nowrap text-[#1A202C]"
+                        className="flex items-center justify-center gap-2 bg-white h-12 px-6 rounded-full border border-gray-100 text-[16px] shadow-sm hover:bg-gray-50 transition-colors whitespace-nowrap text-brand-text"
                       >
                         <Filter size={18} className="text-brand-orange" />
                         <span>Фільтри</span>
@@ -95,7 +95,9 @@ export default function RoomsPage() {
                   className="w-[92%] sm:max-w-105 p-8 overflow-y-auto border-none shadow-2xl"
                 >
                   <SheetHeader className="text-left mb-10">
-                    <SheetTitle className="text-2xl font-bold text-[#1A202C]">Параметри</SheetTitle>
+                    <SheetTitle className="text-2xl font-bold text-brand-text">
+                      Параметри
+                    </SheetTitle>
                   </SheetHeader>
                   <div className="pb-10">
                     <FiltersPanel
@@ -112,7 +114,7 @@ export default function RoomsPage() {
 
             {/* Дропдаун сортування */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center justify-center gap-2 bg-white h-12 px-6 rounded-full border border-gray-100 text-[16px] shadow-sm hover:bg-gray-50 transition-colors whitespace-nowrap text-[#1A202C] focus:outline-none">
+              <DropdownMenuTrigger className="flex items-center justify-center gap-2 bg-white h-12 px-6 rounded-full border border-gray-100 text-[16px] shadow-sm hover:bg-gray-50 transition-colors whitespace-nowrap text-brand-text focus:outline-none">
                 <span>{SORT_LABELS[sort]}</span>
                 <ChevronDown size={18} />
               </DropdownMenuTrigger>
@@ -154,10 +156,10 @@ export default function RoomsPage() {
           {sortedAndFilteredRooms.length === 0 ? (
             <div className="grow flex flex-col items-center justify-center py-20">
               <div className="text-center">
-                <p className="text-lg font-semibold text-[#1A202C]">
+                <p className="text-lg font-semibold text-brand-text">
                   За вашим запитом нічого не знайдено
                 </p>
-                <p className="mt-2 text-sm text-[#6B7280]">Спробуйте змінити фільтри</p>
+                <p className="mt-2 text-sm text-brand-text-subtle">Спробуйте змінити фільтри</p>
               </div>
             </div>
           ) : (

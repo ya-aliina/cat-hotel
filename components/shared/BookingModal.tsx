@@ -62,7 +62,7 @@ export type BookingModalProps = {
 function SuccessView({ onClose }: { onClose?: () => void }) {
   return (
     <div className="text-center">
-      <h1 className="text-[28px] font-bold text-[#1A202C]">Дякуємо за заявку!</h1>
+      <h1 className="text-[28px] font-bold text-brand-text">Дякуємо за заявку!</h1>
       <p className="text-base text-muted-foreground mt-2">Ми зв’яжемося з вами найближчим часом</p>
       <div className="mt-10 flex justify-center">
         <PawButton
@@ -131,7 +131,7 @@ export function BookingModal({
             ) : (
               <>
                 <div className="mb-6 text-center">
-                  <h1 className="text-[28px] font-bold text-[#1A202C]">Забронювати номер</h1>
+                  <h1 className="text-[28px] font-bold text-brand-text">Забронювати номер</h1>
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">

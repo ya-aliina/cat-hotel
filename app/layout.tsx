@@ -38,7 +38,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <Header />
-        <main className="bg-[#FFFDFB]">{children}</main>
+        <main className="bg-brand-surface-alt">{children}</main>
         <Footer />
         <Analytics />
       </body>

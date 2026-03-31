@@ -1,5 +1,6 @@
 export type CarouselRoom = {
   title: string;
+  description: string;
   image: string;
   features: string[];
 };
@@ -7,17 +8,20 @@ export type CarouselRoom = {
 export const CAROUSEL_ROOMS: CarouselRoom[] = [
   {
     title: 'Економ плюс',
-    image: '/rooms/economy-plus.jpg',
+    description: 'Зручний формат для короткого та середнього проживання.',
+    image: '/room1.jpg',
     features: ['Площа: 0,90 м²', 'Розміри (ШхГхВ): 90х100х180 см', 'Ціна за добу: 200₴'],
   },
   {
     title: 'Комфорт',
-    image: '/rooms/comfort.jpg',
-    features: ['Площа: 1,50 м²', 'Розміри (ШхГхВ): 120x100x180 см', 'Ціна за добу: 500₴'],
+    description: 'Баланс ціни, простору і розваг для активного котика.',
+    image: '/room2.jpg',
+    features: ['Площа: 1,13 м²', 'Розміри (ШхГхВ): 100х125х180 см', 'Ціна за добу: 250₴'],
   },
   {
     title: 'Люкс',
-    image: '/rooms/lux.jpg',
-    features: ['Площа: 2,50 м²', 'Розміри (ШхГхВ): 150x120x180 см', 'Ціна за добу: 800₴'],
+    description: 'Преміум-комфорт з максимальним набором оснащення.',
+    image: '/room3.jpg',
+    features: ['Площа: 2,56 м²', 'Розміри (ШхГхВ): 160х160х180 см', 'Ціна за добу: 500₴'],
   },
 ];

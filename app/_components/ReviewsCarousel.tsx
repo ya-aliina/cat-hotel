@@ -71,7 +71,7 @@ const Dots = React.memo(
               }}
               className={cn(
                 'h-3 w-3 rounded-full transition-all duration-300',
-                current === i ? 'bg-brand-yellow' : 'bg-[#D9D9D9]',
+                current === i ? 'bg-brand-yellow' : 'bg-brand-border-soft',
               )}
               aria-label={`Перейти до слайду ${i + 1}`}
               aria-current={current === i}

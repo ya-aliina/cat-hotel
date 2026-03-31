@@ -23,7 +23,7 @@ export function NotificationsSection() {
       id="notifications"
       className="bg-white rounded-[30px] border border-gray-100 shadow-sm p-6 md:p-8"
     >
-      <h2 className="text-2xl font-bold text-[#1A202C]">Сповіщення</h2>
+      <h2 className="text-2xl font-bold text-brand-text">Сповіщення</h2>
 
       <form
         className="mt-6 space-y-4"
@@ -32,7 +32,7 @@ export function NotificationsSection() {
           setNotificationSaved(true);
         }}
       >
-        <label className="flex items-center gap-3 text-[16px] text-[#1A202C] cursor-pointer">
+        <label className="flex items-center gap-3 text-[16px] text-brand-text cursor-pointer">
           <input
             type="checkbox"
             className="w-5 h-5 accent-brand-yellow rounded"
@@ -46,7 +46,7 @@ export function NotificationsSection() {
           Сповіщення про статус бронювання
         </label>
 
-        <label className="flex items-center gap-3 text-[16px] text-[#1A202C] cursor-pointer">
+        <label className="flex items-center gap-3 text-[16px] text-brand-text cursor-pointer">
           <input
             type="checkbox"
             className="w-5 h-5 accent-brand-yellow rounded"
@@ -60,7 +60,7 @@ export function NotificationsSection() {
           Нагадування перед заїздом
         </label>
 
-        <label className="flex items-center gap-3 text-[16px] text-[#1A202C] cursor-pointer">
+        <label className="flex items-center gap-3 text-[16px] text-brand-text cursor-pointer">
           <input
             type="checkbox"
             className="w-5 h-5 accent-brand-yellow rounded"
@@ -79,7 +79,7 @@ export function NotificationsSection() {
             Зберегти налаштування
           </PawButton>
           {notificationSaved && (
-            <p className="text-sm text-[#16A34A]">Налаштування сповіщень збережено</p>
+            <p className="text-sm text-brand-success">Налаштування сповіщень збережено</p>
           )}
         </div>
       </form>

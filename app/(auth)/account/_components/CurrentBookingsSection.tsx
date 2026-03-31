@@ -63,41 +63,45 @@ export function CurrentBookingsSection() {
       id="bookings"
       className="bg-white rounded-[30px] border border-gray-100 shadow-sm p-6 md:p-8"
     >
-      <h2 className="text-2xl font-bold text-[#1A202C]">Поточні бронювання</h2>
+      <h2 className="text-2xl font-bold text-brand-text">Поточні бронювання</h2>
 
       {!hasActiveBookings ? (
-        <p className="mt-6 text-[16px] text-[#6B7280]">У вас немає активних бронювань.</p>
+        <p className="mt-6 text-[16px] text-brand-text-subtle">У вас немає активних бронювань.</p>
       ) : (
         <div className="mt-6 space-y-4">
           {bookings.map((booking) => {
             return (
               <article
                 key={booking.id}
-                className="rounded-2xl border border-gray-100 bg-[#FFFEFC] p-5 md:p-6"
+                className="rounded-2xl border border-gray-100 bg-brand-surface-card p-5 md:p-6"
               >
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <h3 className="text-xl font-bold text-[#1A202C]">{booking.roomTitle}</h3>
-                    <p className="mt-1 text-[15px] text-[#6B7280]">Улюбленець: {booking.petName}</p>
+                    <h3 className="text-xl font-bold text-brand-text">{booking.roomTitle}</h3>
+                    <p className="mt-1 text-[15px] text-brand-text-subtle">
+                      Улюбленець: {booking.petName}
+                    </p>
                   </div>
 
                   <span
                     className={
                       booking.status === 'active'
-                        ? 'inline-flex w-fit rounded-full bg-brand-yellow/30 px-3 py-1 text-[13px] font-semibold text-[#1A202C]'
-                        : 'inline-flex w-fit rounded-full bg-gray-100 px-3 py-1 text-[13px] font-semibold text-[#6B7280]'
+                        ? 'inline-flex w-fit rounded-full bg-brand-yellow/30 px-3 py-1 text-[13px] font-semibold text-brand-text'
+                        : 'inline-flex w-fit rounded-full bg-gray-100 px-3 py-1 text-[13px] font-semibold text-brand-text-subtle'
                     }
                   >
                     {booking.status === 'active' ? 'Активне' : 'Скасовано'}
                   </span>
                 </div>
 
-                <div className="mt-4 grid grid-cols-1 gap-3 text-[15px] text-[#1A202C] sm:grid-cols-2">
+                <div className="mt-4 grid grid-cols-1 gap-3 text-[15px] text-brand-text sm:grid-cols-2">
                   <p>
-                    <span className="text-[#6B7280]">Заїзд:</span> {formatDate(booking.dateFrom)}
+                    <span className="text-brand-text-subtle">Заїзд:</span>{' '}
+                    {formatDate(booking.dateFrom)}
                   </p>
                   <p>
-                    <span className="text-[#6B7280]">Виїзд:</span> {formatDate(booking.dateTo)}
+                    <span className="text-brand-text-subtle">Виїзд:</span>{' '}
+                    {formatDate(booking.dateTo)}
                   </p>
                 </div>
 
