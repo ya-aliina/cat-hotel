@@ -1,6 +1,6 @@
 'use client';
 
-import { MoveLeft, Ruler, Square } from 'lucide-react';
+import { Clock3, MoveLeft, Ruler, ShieldCheck, Square } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
@@ -11,7 +11,7 @@ import { PawButton } from '@/components/ui/PawButton';
 import { AMENITIES } from '../_data/rooms';
 import { useRoomDetails } from './_ hooks/useRoomDetails';
 import { AmenityItem, InfoItem, NotFoundState, RelatedRooms, RoomGallery } from './_components';
-import { formatArea } from './_utils/roomUtils';
+import { formatArea, formatRoomCode } from './_utils/roomUtils';
 
 const amenityLabelById = AMENITIES.reduce<Record<string, string>>((acc, amenity) => {
   acc[amenity.id] = amenity.label;
@@ -73,6 +73,24 @@ export default function RoomDetailsPage() {
                     {room.equipment.map((id) => {
                       return <AmenityItem key={id} id={id} label={amenityLabelById[id] || id} />;
                     })}
+                  </ul>
+                </div>
+
+                <div className="mt-2 rounded-2xl border border-gray-100 bg-brand-surface p-4">
+                  <p className="font-semibold mb-3">Додаткова інформація:</p>
+                  <ul className="space-y-2 text-sm text-brand-text-muted">
+                    <li className="flex items-center gap-2">
+                      <ShieldCheck size={16} className="text-brand-orange" />
+                      Код номера: {formatRoomCode(room.slug)}
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Clock3 size={16} className="text-brand-orange" />
+                      Заїзд з 12:00, виїзд до 12:00
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <ShieldCheck size={16} className="text-brand-orange" />
+                      Щоденний фотозвіт та базовий догляд включено
+                    </li>
                   </ul>
                 </div>
               </div>
