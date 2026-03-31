@@ -9,12 +9,12 @@ import { SecuritySection } from './_components/SecuritySection';
 export default function AccountSettingsPage() {
   return (
     <AccountGuard>
-      <main className="min-h-screen bg-[#FDFBF7]">
+      <main className="min-h-screen bg-brand-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-24">
           <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h1 className="text-4xl font-bold text-[#1A202C]">Налаштування акаунту</h1>
-              <p className="mt-3 text-[#6B7280] text-[16px]">
+              <h1 className="text-4xl font-bold text-brand-text">Налаштування акаунту</h1>
+              <p className="mt-3 text-brand-text-subtle text-[16px]">
                 Керуйте особистими даними, паролем та сповіщеннями.
               </p>
             </div>

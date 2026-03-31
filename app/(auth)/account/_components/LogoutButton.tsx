@@ -14,7 +14,12 @@ export function LogoutButton() {
   };
 
   return (
-    <PawButton type="button" variant="accent" className="bg-brand-orange text-white" onClick={handleLogout}>
+    <PawButton
+      type="button"
+      variant="accent"
+      className="bg-brand-orange text-white"
+      onClick={handleLogout}
+    >
       Вийти
     </PawButton>
   );

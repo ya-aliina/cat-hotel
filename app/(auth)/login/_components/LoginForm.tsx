@@ -29,7 +29,7 @@ export const LoginForm = ({ onSwitch }: AuthFormProps) => {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = (_data: LoginData) => {
+  const onSubmit = () => {
     signIn();
     router.push('/');
   };

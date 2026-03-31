@@ -43,6 +43,7 @@ const RoomCard = React.memo(
         <div className="relative z-10 bg-white p-6 md:p-10 rounded-[8px] border border-gray-50 -mt-15 md:mt-0 md:-ml-25 w-[95%] md:w-125 md:h-71 flex flex-col justify-center">
           <div className="md:max-w-70.75">
             <h3 className="text-xl md:text-2xl font-bold  mb-4">{room.title}</h3>
+            <p className="text-sm text-brand-text-soft mb-4">{room.description}</p>
 
             <ul className="space-y-2 mb-6">
               {room.features.map((feature) => {
@@ -92,7 +93,7 @@ const Dots = React.memo(
               }}
               className={cn(
                 'h-3 w-3 rounded-full transition-all duration-300',
-                current === i ? 'bg-brand-yellow' : 'bg-[#D9D9D9]',
+                current === i ? 'bg-brand-yellow' : 'bg-brand-border-soft',
               )}
               aria-label={`Перейти до слайду ${i + 1}`}
               aria-current={current === i}

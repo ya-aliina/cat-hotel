@@ -9,12 +9,12 @@ export function AccountSidebar() {
         </div>
 
         <div>
-          <p className="text-[20px] font-bold text-[#1A202C]">Марія Котенко</p>
-          <p className="text-[14px] text-[#6B7280]">maria@example.com</p>
+          <p className="text-[20px] font-bold text-brand-text">Марія Котенко</p>
+          <p className="text-[14px] text-brand-text-subtle">maria@example.com</p>
         </div>
       </div>
 
-      <div className="mt-8 space-y-2 text-[15px] text-[#1A202C]">
+      <div className="mt-8 space-y-2 text-[15px] text-brand-text">
         <p className="font-semibold">Швидка навігація</p>
         <a href="#bookings" className="block hover:text-brand-orange transition-colors">
           Поточні бронювання

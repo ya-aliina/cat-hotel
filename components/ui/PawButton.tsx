@@ -12,14 +12,14 @@ interface ButtonStyle {
 
 const variants: Record<'default' | 'accent', ButtonStyle> = {
   default: {
-    button: 'bg-white text-[#1A202C]',
+    button: 'bg-white text-brand-text',
     circle: 'bg-orange-500',
     icon: 'text-white',
   },
   accent: {
-    button: 'bg-[#FF7043] text-white',
+    button: 'bg-brand-orange text-white',
     circle: 'bg-white',
-    icon: 'text-[#FF7043]',
+    icon: 'text-brand-orange',
   },
 };
 
