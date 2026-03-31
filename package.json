@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "deploy:preview": "vercel --yes",
+    "deploy:prod": "vercel --prod --yes"
   },
   "dependencies": {
     "@base-ui/react": "^1.2.0",
@@ -41,6 +43,7 @@
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "prettier": "^3.8.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vercel": "^50.37.3"
   }
 }
