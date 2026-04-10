@@ -16,6 +16,7 @@ import { PawButton } from '@/components/ui/PawButton';
 import { cn } from '@/lib/utils';
 
 import { CAROUSEL_ROOMS, type CarouselRoom } from '../_data/carousel-rooms';
+import { ROOMS } from '../rooms/_data/rooms';
 
 const RoomCard = React.memo(
   ({
@@ -25,7 +26,7 @@ const RoomCard = React.memo(
   }: {
     room: CarouselRoom;
     isPriority: boolean;
-    onBook: () => void;
+    onBook: (room: CarouselRoom) => void;
   }) => {
     return (
       <div className="flex flex-col md:flex-row items-center justify-center">
@@ -60,7 +61,9 @@ const RoomCard = React.memo(
               type="button"
               variant="accent"
               className="bg-brand-orange text-white py-2 shadow-lg"
-              onClick={onBook}
+              onClick={() => {
+                onBook(room);
+              }}
             >
               Забронювати
             </PawButton>
@@ -113,8 +116,14 @@ export function RoomsCarousel() {
 
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [initialRoomId, setInitialRoomId] = useState<string>();
 
-  const openBookingModal = useCallback(() => {
+  const openBookingModal = useCallback((room: CarouselRoom) => {
+    const matchedRoom = ROOMS.find((candidate) => {
+      return candidate.title === room.title;
+    });
+
+    setInitialRoomId(matchedRoom?.id);
     setBookingSuccess(false);
     setIsBookingOpen(true);
   }, []);
@@ -212,6 +221,10 @@ export function RoomsCarousel() {
             }
           }}
           onSubmit={handleBookingSubmit}
+          rooms={ROOMS.map((room) => {
+            return { id: room.id, title: room.title, price: room.price };
+          })}
+          initialRoomId={initialRoomId}
           success={bookingSuccess}
           onSuccessClose={closeBookingModal}
         />

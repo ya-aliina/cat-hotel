@@ -8,7 +8,7 @@ import { ContactSection } from '@/app/_components/ContactSection';
 import { BookingModal } from '@/components/shared/BookingModal';
 import { PawButton } from '@/components/ui/PawButton';
 
-import { AMENITIES } from '../_data/rooms';
+import { AMENITIES, ROOMS } from '../_data/rooms';
 import { useRoomDetails } from './_ hooks/useRoomDetails';
 import { AmenityItem, InfoItem, NotFoundState, RelatedRooms, RoomGallery } from './_components';
 import { formatArea, formatRoomCode } from './_utils/roomUtils';
@@ -96,10 +96,7 @@ export default function RoomDetailsPage() {
               </div>
 
               <div className="mt-7 pt-6 border-t border-gray-50">
-                <p className="text-2xl font-bold text-brand-text">Ціна за добу: {room.price}₴</p>
-                <p className="mt-2 text-sm text-brand-text-soft">
-                  Вільних номерів: {room.availableRooms}
-                </p>
+                <p className="text-2xl font-bold text-brand-text">Ціна за добу: {room.price}₴</p> 
                 <div className="mt-6">
                   <PawButton
                     variant="accent"
@@ -121,8 +118,18 @@ export default function RoomDetailsPage() {
 
       <BookingModal
         open={isBookingOpen}
-        onOpenChange={setIsBookingOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            closeBookingModal();
+          } else {
+            setIsBookingOpen(open);
+          }
+        }}
         onSubmit={handleBookingSubmit}
+        rooms={ROOMS.map((item) => {
+          return { id: item.id, title: item.title, price: item.price };
+        })}
+        initialRoomId={room.id}
         success={bookingSuccess}
         onSuccessClose={closeBookingModal}
       />

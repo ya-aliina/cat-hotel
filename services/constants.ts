@@ -1,0 +1,17 @@
+export enum ApiRoutes {
+  USERS = '/users',
+  CATS = '/cats',
+  CAT_REPORTS = '/cat-reports',
+  REPORT_IMAGES = '/report-images',
+  ROOM_CATEGORIES = '/room-categories',
+  ROOMS = '/rooms',
+  ROOM_AREAS = '/room-areas',
+  FEATURES = '/features',
+  SERVICES = '/services',
+  REVIEWS = '/reviews',
+  BOOKING_ITEMS = '/booking-items',
+  BOOKING_ITEM_SERVICES = '/booking-item-services',
+  BOOKINGS = '/bookings',
+  NEWS = '/news',
+  VERIFICATION_CODES = '/verification-codes',
+}

@@ -15,7 +15,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { ContactSection } from '../_components/ContactSection';
 import { type FiltersConfig, FiltersPanel } from './_components/FiltersPanel';
 import { RoomCard } from './_components/RoomCard';
-import { AMENITIES, AREAS } from './_data/rooms';
+import { AMENITIES, AREAS, ROOMS } from './_data/rooms';
 import { type SortOption, useRoomFilters } from './_hooks/useRoomFilters';
 
 const SORT_LABELS: Record<SortOption, string> = {
@@ -45,8 +45,10 @@ export default function RoomsPage() {
 
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [initialRoomId, setInitialRoomId] = useState<string>();
 
-  const openBookingModal = () => {
+  const openBookingModal = (roomId?: string) => {
+    setInitialRoomId(roomId);
     setBookingSuccess(false);
     setIsBookingOpen(true);
   };
@@ -167,7 +169,12 @@ export default function RoomsPage() {
               {sortedAndFilteredRooms.map((room) => {
                 return (
                   <div key={room.id} className="h-full  md:max-w-90 w-full">
-                    <RoomCard room={room} onBook={openBookingModal} />
+                    <RoomCard
+                      room={room}
+                      onBook={(selectedRoom) => {
+                        openBookingModal(selectedRoom.id);
+                      }}
+                    />
                   </div>
                 );
               })}
@@ -186,6 +193,10 @@ export default function RoomsPage() {
           }
         }}
         onSubmit={handleBookingSubmit}
+        rooms={ROOMS.map((room) => {
+          return { id: room.id, title: room.title, price: room.price };
+        })}
+        initialRoomId={initialRoomId}
         success={bookingSuccess}
         onSuccessClose={handleSuccessClose}
       />
