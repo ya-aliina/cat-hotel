@@ -51,6 +51,29 @@ export const registerFormSchema = registerInputSchema
     },
   );
 
+export const accountProfileInputSchema = z.object({
+  email: emailFieldSchema,
+  name: nameFieldSchema,
+  phone: phoneFieldSchema.nullable().optional(),
+  surname: nameFieldSchema,
+});
+
+export const accountPasswordInputSchema = z
+  .object({
+    confirmPassword: z.string().min(1, 'Обовʼязкове поле.'),
+    currentPassword: z.string().trim().optional(),
+    newPassword: passwordFieldSchema,
+  })
+  .refine(
+    (data) => {
+      return data.newPassword === data.confirmPassword;
+    },
+    {
+      message: 'Паролі не співпадають.',
+      path: ['confirmPassword'],
+    },
+  );
+
 export const resetPasswordFormSchema = z
   .object({
     password: passwordFieldSchema,
@@ -73,6 +96,8 @@ export const resetPasswordInputSchema = z.object({
 
 export type LoginData = z.infer<typeof loginSchema>;
 export type EmailRequestData = z.infer<typeof emailRequestSchema>;
+export type AccountProfileInputData = z.infer<typeof accountProfileInputSchema>;
+export type AccountPasswordInputData = z.infer<typeof accountPasswordInputSchema>;
 export type RegisterData = z.infer<typeof registerFormSchema>;
 export type RegisterInputData = z.infer<typeof registerInputSchema>;
 export type ResetPasswordData = z.infer<typeof resetPasswordFormSchema>;

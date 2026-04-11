@@ -28,20 +28,23 @@ export function ProfileSection() {
   const { data: session, status, update } = useSession();
   const [formData, setFormData] = useState<ProfileFormState>(emptyProfileForm);
   const [formError, setFormError] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [profileSaved, setProfileSaved] = useState(false);
+
+  const sessionFormData: ProfileFormState = {
+    email: session?.user?.email ?? '',
+    name: session?.user?.name ?? '',
+    phone: session?.user?.phone ?? '',
+    surname: session?.user?.surname ?? '',
+  };
 
   useEffect(() => {
     if (!session?.user) {
       return;
     }
 
-    setFormData({
-      email: session.user.email ?? '',
-      name: session.user.name ?? '',
-      phone: session.user.phone ?? '',
-      surname: session.user.surname ?? '',
-    });
+    setFormData(sessionFormData);
   }, [session?.user?.email, session?.user?.name, session?.user?.phone, session?.user?.surname]);
 
   const avatarSrc = session?.user?.image;
@@ -65,9 +68,6 @@ export function ProfileSection() {
 
         <div>
           <p className="text-lg font-semibold text-brand-text">{fullName || 'Ваш профіль'}</p>
-          <p className="text-sm text-brand-text-subtle">
-            {session?.user?.image ? 'Фото підтягнуто з акаунта Google.' : 'Фото профілю поки відсутнє.'}
-          </p>
         </div>
       </div>
 
@@ -92,7 +92,7 @@ export function ProfileSection() {
             surname: formData.surname.trim(),
           };
 
-          const response = await fetch(`/api/users/${session.user.id}`, {
+          const response = await fetch('/api/account/profile', {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
@@ -117,6 +117,7 @@ export function ProfileSection() {
           });
 
           setIsSubmitting(false);
+          setIsEditing(false);
           setProfileSaved(true);
           router.refresh();
         }}
@@ -125,16 +126,20 @@ export function ProfileSection() {
           <Input
             type="text"
             placeholder="Ім'я"
+            disabled={!isEditing || isSubmitting || status === 'loading'}
             value={formData.name}
             onChange={(event) => {
+              setProfileSaved(false);
               setFormData((current) => ({ ...current, name: event.target.value }));
             }}
           />
           <Input
             type="text"
             placeholder="Прізвище"
+            disabled={!isEditing || isSubmitting || status === 'loading'}
             value={formData.surname}
             onChange={(event) => {
+              setProfileSaved(false);
               setFormData((current) => ({ ...current, surname: event.target.value }));
             }}
           />
@@ -143,29 +148,64 @@ export function ProfileSection() {
         <Input
           type="email"
           placeholder="E-mail"
+          disabled={!isEditing || isSubmitting || status === 'loading'}
           value={formData.email}
           onChange={(event) => {
+            setProfileSaved(false);
             setFormData((current) => ({ ...current, email: event.target.value }));
           }}
         />
         <Input
           type="tel"
           placeholder="Телефон"
+          disabled={!isEditing || isSubmitting || status === 'loading'}
           value={formData.phone}
           onChange={(event) => {
+            setProfileSaved(false);
             setFormData((current) => ({ ...current, phone: event.target.value }));
           }}
         />
 
         <div className="flex items-center gap-4 pt-2">
-          <PawButton
-            type="submit"
-            variant="accent"
-            className="bg-brand-orange text-white"
-            disabled={isSubmitting || status === 'loading'}
-          >
-            {isSubmitting ? 'Зберігаємо...' : 'Зберегти зміни'}
-          </PawButton>
+          {!isEditing ? (
+            <PawButton
+              type="button"
+              variant="accent"
+              className="bg-brand-orange text-white"
+              onClick={() => {
+                setFormError(null);
+                setProfileSaved(false);
+                setIsEditing(true);
+              }}
+              disabled={status === 'loading'}
+            >
+              Редагувати
+            </PawButton>
+          ) : (
+            <>
+              <PawButton
+                type="submit"
+                variant="accent"
+                className="bg-brand-orange text-white"
+                disabled={isSubmitting || status === 'loading'}
+              >
+                {isSubmitting ? 'Зберігаємо...' : 'Зберегти зміни'}
+              </PawButton>
+              <button
+                type="button"
+                className="text-sm font-medium text-brand-text-subtle transition-colors hover:text-brand-orange"
+                onClick={() => {
+                  setFormError(null);
+                  setProfileSaved(false);
+                  setFormData(sessionFormData);
+                  setIsEditing(false);
+                }}
+                disabled={isSubmitting}
+              >
+                Скасувати
+              </button>
+            </>
+          )}
           {formError && <p className="text-sm text-destructive">{formError}</p>}
           {profileSaved && <p className="text-sm text-brand-success">Дані профілю оновлено</p>}
         </div>
