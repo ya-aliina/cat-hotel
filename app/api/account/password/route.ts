@@ -39,19 +39,28 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: 'Користувача не знайдено.' }, { status: 404 });
     }
 
-    const currentPassword = parsedBody.data.currentPassword?.trim() ?? '';
     const isOauthOnlyUser = user.provider === 'google' && Boolean(user.providerId);
 
-    if (!isOauthOnlyUser) {
-      if (!currentPassword) {
-        return NextResponse.json({ error: 'Вкажіть поточний пароль.' }, { status: 400 });
-      }
+    if (isOauthOnlyUser) {
+      return NextResponse.json(
+        {
+          error:
+            'Для акаунта, створеного через сторонній сервіс, зміна пароля недоступна. Керуйте паролем у вашому провайдері входу.',
+        },
+        { status: 403 },
+      );
+    }
 
-      const isCurrentPasswordValid = await compare(currentPassword, user.password);
+    const currentPassword = parsedBody.data.currentPassword?.trim() ?? '';
 
-      if (!isCurrentPasswordValid) {
-        return NextResponse.json({ error: 'Поточний пароль невірний.' }, { status: 400 });
-      }
+    if (!currentPassword) {
+      return NextResponse.json({ error: 'Вкажіть поточний пароль.' }, { status: 400 });
+    }
+
+    const isCurrentPasswordValid = await compare(currentPassword, user.password);
+
+    if (!isCurrentPasswordValid) {
+      return NextResponse.json({ error: 'Поточний пароль невірний.' }, { status: 400 });
     }
 
     if (currentPassword && currentPassword === parsedBody.data.newPassword) {

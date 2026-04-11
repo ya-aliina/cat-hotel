@@ -1,10 +1,6 @@
 import { AccountGuard } from './_components/AccountGuard';
-import { AccountSidebar } from './_components/AccountSidebar';
-import { CurrentBookingsSection } from './_components/CurrentBookingsSection';
+import { AccountContentSwitcher } from './_components/AccountContentSwitcher';
 import { LogoutButton } from './_components/LogoutButton';
-import { NotificationsSection } from './_components/NotificationsSection';
-import { ProfileSection } from './_components/ProfileSection';
-import { SecuritySection } from './_components/SecuritySection';
 
 export default function AccountSettingsPage() {
   return (
@@ -24,16 +20,7 @@ export default function AccountSettingsPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[320px_minmax(0,1fr)] gap-8 items-start">
-            <AccountSidebar />
-
-            <div className="space-y-6">
-              <CurrentBookingsSection />
-              <ProfileSection />
-              <SecuritySection />
-              <NotificationsSection />
-            </div>
-          </div>
+          <AccountContentSwitcher />
         </div>
       </main>
     </AccountGuard>

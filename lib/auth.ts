@@ -19,6 +19,7 @@ const userSessionSelect = {
   id: true,
   name: true,
   phone: true,
+  provider: true,
   role: true,
   surname: true,
 } as const;
@@ -123,6 +124,7 @@ function applyUserToToken(
     name?: string | null;
     picture?: string | null;
     phone?: string;
+    provider?: string | null;
     role?: 'USER' | 'EMPLOYEE' | 'ADMIN';
     surname?: string;
   },
@@ -132,6 +134,7 @@ function applyUserToToken(
     image?: string | null;
     name: string;
     phone: string | null;
+    provider?: string | null;
     role: 'USER' | 'EMPLOYEE' | 'ADMIN';
     surname: string;
   },
@@ -141,6 +144,7 @@ function applyUserToToken(
   token.picture = user.image ?? token.picture ?? null;
   token.name = user.name;
   token.phone = user.phone ?? '';
+  token.provider = user.provider ?? null;
   token.role = user.role;
   token.surname = user.surname;
 
@@ -254,6 +258,7 @@ export const authOptions: NextAuthOptions = {
           image?: string | null;
           name?: string | null;
           phone?: string | null;
+          provider?: string | null;
           surname?: string | null;
         };
 
@@ -271,6 +276,10 @@ export const authOptions: NextAuthOptions = {
 
         if (typeof sessionUpdate.phone === 'string' || sessionUpdate.phone === null) {
           token.phone = sessionUpdate.phone ?? '';
+        }
+
+        if (typeof sessionUpdate.provider === 'string' || sessionUpdate.provider === null) {
+          token.provider = sessionUpdate.provider;
         }
 
         if (typeof sessionUpdate.surname === 'string') {
@@ -318,6 +327,7 @@ export const authOptions: NextAuthOptions = {
         session.user.image = typeof token.picture === 'string' ? token.picture : null;
         session.user.name = token.name ?? null;
         session.user.phone = typeof token.phone === 'string' ? token.phone : '';
+        session.user.provider = typeof token.provider === 'string' ? token.provider : null;
         session.user.role = token.role ?? 'USER';
         session.user.surname = typeof token.surname === 'string' ? token.surname : '';
       }

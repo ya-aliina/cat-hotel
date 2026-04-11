@@ -13,12 +13,8 @@ type Booking = {
 };
 
 type BookingsResponse = {
-  activeBookings?: Booking[];
   error?: string;
-};
-
-type CurrentBookingsSectionProps = {
-  onOpenHistory?: () => void;
+  historyBookings?: Booking[];
 };
 
 function formatDate(date: string) {
@@ -29,7 +25,20 @@ function formatDate(date: string) {
   });
 }
 
-export function CurrentBookingsSection({ onOpenHistory }: CurrentBookingsSectionProps) {
+function getStatusLabel(status: BookingStatus) {
+  switch (status) {
+    case BookingStatus.SUCCEEDED:
+      return 'Завершене';
+    case BookingStatus.PENDING:
+      return 'Не завершене';
+    case BookingStatus.CANCELLED:
+      return 'Скасоване';
+    default:
+      return status;
+  }
+}
+
+export function BookingHistorySection() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -37,7 +46,7 @@ export function CurrentBookingsSection({ onOpenHistory }: CurrentBookingsSection
   useEffect(() => {
     let isMounted = true;
 
-    const loadBookings = async () => {
+    const loadHistoryBookings = async () => {
       setIsLoading(true);
       setError(null);
 
@@ -50,70 +59,40 @@ export function CurrentBookingsSection({ onOpenHistory }: CurrentBookingsSection
 
       if (!response.ok) {
         setIsLoading(false);
-        setError(responseData?.error ?? 'Не вдалося завантажити бронювання.');
+        setError(responseData?.error ?? 'Не вдалося завантажити історію бронювань.');
         return;
       }
 
-      setBookings(responseData?.activeBookings ?? []);
+      setBookings(responseData?.historyBookings ?? []);
       setIsLoading(false);
     };
 
-    void loadBookings();
+    void loadHistoryBookings();
 
     return () => {
       isMounted = false;
     };
   }, []);
 
-  const hasActiveBookings = useMemo(() => {
+  const hasHistoryBookings = useMemo(() => {
     return bookings.length > 0;
   }, [bookings]);
 
-  const getStatusLabel = (status: BookingStatus) => {
-    switch (status) {
-      case BookingStatus.SUCCEEDED:
-        return 'Підтверджене';
-      case BookingStatus.PENDING:
-        return 'Очікує підтвердження';
-      case BookingStatus.CANCELLED:
-        return 'Скасоване';
-      default:
-        return status;
-    }
-  };
-
   return (
     <section
-      id="bookings"
+      id="bookings-history"
       className="bg-white rounded-[30px] border border-gray-100 shadow-sm p-6 md:p-8"
     >
-      <h2 className="text-2xl font-bold text-brand-text">Поточні бронювання</h2>
+      <h2 className="text-2xl font-bold text-brand-text">Історія бронювань</h2>
 
       {isLoading ? (
-        <p className="mt-6 text-[16px] text-brand-text-subtle">Завантажуємо ваші бронювання...</p>
+        <p className="mt-6 text-[16px] text-brand-text-subtle">Завантажуємо історію бронювань...</p>
       ) : error ? (
         <p className="mt-6 text-[16px] text-destructive">{error}</p>
-      ) : !hasActiveBookings ? (
-        <div className="mt-6 space-y-2">
-          <p className="text-[16px] text-brand-text-subtle">У вас поки немає активних бронювань.</p>
-          <p className="text-[15px] text-brand-text-subtle">
-            Перегляньте{' '}
-            {onOpenHistory ? (
-              <button
-                type="button"
-                onClick={onOpenHistory}
-                className="font-medium text-brand-orange hover:text-brand-text"
-              >
-                історію бронювань
-              </button>
-            ) : (
-              <a href="#bookings-history" className="font-medium text-brand-orange hover:text-brand-text">
-                історію бронювань
-              </a>
-            )}
-            .
-          </p>
-        </div>
+      ) : !hasHistoryBookings ? (
+        <p className="mt-6 text-[16px] text-brand-text-subtle">
+          Історія бронювань поки порожня.
+        </p>
       ) : (
         <div className="mt-6 space-y-4">
           {bookings.map((booking) => {
@@ -132,9 +111,7 @@ export function CurrentBookingsSection({ onOpenHistory }: CurrentBookingsSection
                     </p>
                   </div>
 
-                  <span
-                    className="inline-flex w-fit rounded-full bg-brand-yellow/30 px-3 py-1 text-[13px] font-semibold text-brand-text"
-                  >
+                  <span className="inline-flex w-fit rounded-full bg-gray-100 px-3 py-1 text-[13px] font-semibold text-brand-text-subtle">
                     {getStatusLabel(booking.status)}
                   </span>
                 </div>
