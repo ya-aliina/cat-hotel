@@ -14,9 +14,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 
 import { ContactSection } from '../_components/ContactSection';
 import { FiltersPanel } from './_components/FiltersPanel';
-import type { FiltersConfig } from './_components/filters.types';
 import { RoomCard } from './_components/RoomCard';
-import { FEATURES, ROOMS } from './_data/rooms';
+import { RoomCardSkeleton } from './_components/RoomCardSkeleton';
 import { type SortOption, useRoomFilters } from './_hooks/useRoomFilters';
 
 const SORT_LABELS: Record<SortOption, string> = {
@@ -25,12 +24,6 @@ const SORT_LABELS: Record<SortOption, string> = {
   'price-asc': '↑ По ціні',
   'price-desc': '↓ По ціні',
 };
-
-const FILTERS_CONFIG: FiltersConfig = {
-  features: FEATURES,
-};
-
-// --- Головний UI компонент ---
 
 export default function RoomsPage() {
   const {
@@ -41,6 +34,9 @@ export default function RoomsPage() {
     handleApply,
     handleReset,
     sortedAndFilteredRooms,
+    bookingRooms,
+    isLoading,
+    error,
   } = useRoomFilters();
 
   const [isBookingOpen, setIsBookingOpen] = useState(false);
@@ -103,7 +99,6 @@ export default function RoomsPage() {
                   </SheetHeader>
                   <div className="pb-10">
                     <FiltersPanel
-                      config={FILTERS_CONFIG}
                       draftFilters={draftFilters}
                       onDraftFiltersChange={setDraftFilters}
                       onApply={handleApply}
@@ -146,7 +141,6 @@ export default function RoomsPage() {
           {/* Десктопний сайдбар */}
           <aside className="hidden md:block w-64 shrink-0">
             <FiltersPanel
-              config={FILTERS_CONFIG}
               draftFilters={draftFilters}
               onDraftFiltersChange={setDraftFilters}
               onApply={handleApply}
@@ -155,7 +149,23 @@ export default function RoomsPage() {
           </aside>
 
           {/* Сітка кімнат */}
-          {sortedAndFilteredRooms.length === 0 ? (
+          {isLoading ? (
+            <div className="grow grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+              {Array.from({ length: 6 }).map((_, index) => {
+                return (
+                  <div key={index} className="h-full md:max-w-90 w-full">
+                    <RoomCardSkeleton />
+                  </div>
+                );
+              })}
+            </div>
+          ) : error ? (
+            <div className="grow flex flex-col items-center justify-center py-20">
+              <div className="text-center">
+                <p className="text-lg font-semibold text-brand-text">{error}</p>
+              </div>
+            </div>
+          ) : sortedAndFilteredRooms.length === 0 ? (
             <div className="grow flex flex-col items-center justify-center py-20">
               <div className="text-center">
                 <p className="text-lg font-semibold text-brand-text">
@@ -166,10 +176,11 @@ export default function RoomsPage() {
             </div>
           ) : (
             <div className="grow grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
-              {sortedAndFilteredRooms.map((room) => {
+              {sortedAndFilteredRooms.map((room, index) => {
                 return (
                   <div key={room.id} className="h-full  md:max-w-90 w-full">
                     <RoomCard
+                      imagePriority={index < 3}
                       room={room}
                       onBook={(selectedRoom) => {
                         openBookingModal(selectedRoom.id);
@@ -193,9 +204,7 @@ export default function RoomsPage() {
           }
         }}
         onSubmit={handleBookingSubmit}
-        rooms={ROOMS.map((room) => {
-          return { id: room.id, title: room.title, price: room.price };
-        })}
+        rooms={bookingRooms}
         initialRoomId={initialRoomId}
         success={bookingSuccess}
         onSuccessClose={handleSuccessClose}

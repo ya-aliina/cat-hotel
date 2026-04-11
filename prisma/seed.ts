@@ -6,11 +6,14 @@ import {
   Cats,
   Features,
   News,
+  PerfectForItems,
   ReportImages,
   Reviews,
   RoomAreas,
   RoomCategories,
   RoomCategoryFeatures,
+  RoomCategoryImages,
+  RoomCategoryPerfectForItems,
   Rooms,
   Services,
   Users,
@@ -31,6 +34,10 @@ async function up() {
     data: Features,
   });
 
+  await prisma.perfectForItem.createMany({
+    data: PerfectForItems,
+  });
+
   await prisma.service.createMany({
     data: Services,
   });
@@ -46,6 +53,25 @@ async function up() {
         data: {
           features: {
             connect: featureIds.map((id) => {
+              return { id };
+            }),
+          },
+        },
+      });
+    }),
+  );
+
+  await prisma.roomCategoryImage.createMany({
+    data: RoomCategoryImages,
+  });
+
+  await Promise.all(
+    RoomCategoryPerfectForItems.map(({ roomCategoryId, perfectForIds }) => {
+      return prisma.roomCategory.update({
+        where: { id: roomCategoryId },
+        data: {
+          perfectFor: {
+            connect: perfectForIds.map((id) => {
               return { id };
             }),
           },
@@ -98,7 +124,7 @@ async function up() {
 async function down() {
   try {
     await prisma.$executeRaw`
-      TRUNCATE TABLE "ReportImage", "CatReport", "Review", "BookingItemService", "BookingItem", "Booking", "VerificationCode", "News", "Cat", "Room", "RoomCategory", "Feature", "Service", "RoomArea", "User"
+      TRUNCATE TABLE "ReportImage", "CatReport", "Review", "BookingItemService", "BookingItem", "Booking", "VerificationCode", "News", "Cat", "Room", "PerfectForItem", "RoomCategoryImage", "RoomCategory", "Feature", "Service", "RoomArea", "User"
       RESTART IDENTITY CASCADE;
     `;
   } catch (error) {

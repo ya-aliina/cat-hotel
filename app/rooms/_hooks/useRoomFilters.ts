@@ -3,7 +3,8 @@
 import { useCallback, useMemo, useState } from 'react';
 
 import type { FiltersState } from '../_components/filters.types';
-import { ROOMS } from '../_data/rooms';
+import type { Room } from '../_types/room';
+import { useRoomCatalog } from './useRoomCatalog';
 
 export type SortOption = 'area-asc' | 'area-desc' | 'price-asc' | 'price-desc';
 
@@ -17,6 +18,7 @@ const DEFAULT_FILTERS: FiltersState = {
 };
 
 export function useRoomFilters() {
+  const { rooms, isLoading, error } = useRoomCatalog();
   const [sort, setSort] = useState<SortOption>('area-asc');
   const [draftFilters, setDraftFilters] = useState<FiltersState>(DEFAULT_FILTERS);
   const [appliedFilters, setAppliedFilters] = useState<FiltersState>(DEFAULT_FILTERS);
@@ -31,7 +33,7 @@ export function useRoomFilters() {
   }, []);
 
   const sortedAndFilteredRooms = useMemo(() => {
-    const filteredRooms = ROOMS.filter((room) => {
+    const filteredRooms = rooms.filter((room: Room) => {
       const min = Number(appliedFilters.priceMin);
       const max = Number(appliedFilters.priceMax);
 
@@ -55,7 +57,7 @@ export function useRoomFilters() {
       return true;
     });
 
-    return filteredRooms.sort((a, b) => {
+    return [...filteredRooms].sort((a, b) => {
       switch (sort) {
         case 'area-asc':
           return a.area - b.area;
@@ -69,7 +71,7 @@ export function useRoomFilters() {
           return 0;
       }
     });
-  }, [appliedFilters, sort]);
+  }, [appliedFilters, rooms, sort]);
 
   return {
     sort,
@@ -79,5 +81,10 @@ export function useRoomFilters() {
     handleApply,
     handleReset,
     sortedAndFilteredRooms,
+    bookingRooms: rooms.map((room: Room) => {
+      return { id: room.id, title: room.title, price: room.price };
+    }),
+    isLoading,
+    error,
   };
 }

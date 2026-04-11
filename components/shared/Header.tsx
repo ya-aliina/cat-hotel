@@ -57,6 +57,8 @@ const Header = () => {
                 width={48}
                 height={40}
                 className="w-full h-full object-contain"
+                loading="eager"
+                fetchPriority="high"
               />
             </Link>
           </div>

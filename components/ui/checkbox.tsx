@@ -10,7 +10,7 @@ interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>
 }
 
 export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ checked, className, label, onChange, wrapperClassName, ...props },  ref) => {
+  ({ checked, className, label, onChange, wrapperClassName, ...props }, ref) => {
     return (
       <label
         className={cn(

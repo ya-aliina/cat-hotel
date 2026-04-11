@@ -1,25 +1,28 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { ROOMS } from '../../_data/rooms';
+import { useRoomCatalog } from '../../_hooks/useRoomCatalog';
 
 export function useRoomDetails(roomIdentifier: string) {
+  const { rooms, bookingRooms, isLoading, error } = useRoomCatalog();
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const room = useMemo(() => {
-    return ROOMS.find((r) => {
+    return rooms.find((r) => {
       return r.slug === roomIdentifier || r.id === roomIdentifier;
     });
-  }, [roomIdentifier]);
+  }, [roomIdentifier, rooms]);
 
   const otherRooms = useMemo(() => {
     return room
-      ? ROOMS.filter((r) => {
-          return r.id !== room.id;
-        }).slice(0, 3)
+      ? rooms
+          .filter((r) => {
+            return r.id !== room.id;
+          })
+          .slice(0, 3)
       : [];
-  }, [room]);
+  }, [room, rooms]);
 
   const gallery = useMemo(() => {
     return room && room.gallery?.length ? room.gallery : room ? [room.image] : [];
@@ -41,6 +44,9 @@ export function useRoomDetails(roomIdentifier: string) {
     otherRooms,
     gallery,
     activeImage,
+    bookingRooms,
+    isLoading,
+    error,
     isBookingOpen,
     bookingSuccess,
     setSelectedImage,

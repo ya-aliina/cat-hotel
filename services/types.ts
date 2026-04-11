@@ -63,6 +63,24 @@ export interface RoomCategoryBase {
   widthCm: number;
 }
 
+export interface RoomCategoryImageBase {
+  createdAt: DateTimeString;
+  id: number;
+  isCover: boolean;
+  roomCategoryId: number;
+  sortOrder: number;
+  updatedAt: DateTimeString;
+  url: string;
+}
+
+export interface PerfectForItemBase {
+  createdAt: DateTimeString;
+  description: string;
+  id: number;
+  imageUrl: string;
+  updatedAt: DateTimeString;
+}
+
 export interface RoomBase {
   categoryId: number;
   createdAt: DateTimeString;
@@ -180,7 +198,17 @@ export interface ReportImageDto extends ReportImageBase {
 export interface RoomCategoryDto extends RoomCategoryBase {
   area: RoomAreaBase;
   features: FeatureBase[];
+  images: RoomCategoryImageBase[];
+  perfectFor: PerfectForItemBase[];
   rooms: RoomBase[];
+}
+
+export interface RoomCategoryImageDto extends RoomCategoryImageBase {
+  roomCategory: RoomCategoryBase;
+}
+
+export interface PerfectForItemDto extends PerfectForItemBase {
+  roomCategories: RoomCategoryBase[];
 }
 
 export interface RoomDto extends RoomBase {
@@ -282,6 +310,22 @@ export interface RoomCategoryCreateInput {
 }
 
 export type RoomCategoryUpdateInput = Partial<RoomCategoryCreateInput>;
+
+export interface RoomCategoryImageCreateInput {
+  isCover?: boolean;
+  roomCategoryId: number;
+  sortOrder?: number;
+  url: string;
+}
+
+export type RoomCategoryImageUpdateInput = Partial<RoomCategoryImageCreateInput>;
+
+export interface PerfectForItemCreateInput {
+  description: string;
+  imageUrl: string;
+}
+
+export type PerfectForItemUpdateInput = Partial<PerfectForItemCreateInput>;
 
 export interface RoomCreateInput {
   categoryId: number;

@@ -16,29 +16,37 @@ import { PawButton } from '@/components/ui/PawButton';
 import { cn } from '@/lib/utils';
 
 import { CAROUSEL_ROOMS, type CarouselRoom } from '../_data/carousel-rooms';
-import { ROOMS } from '../rooms/_data/rooms';
+import { useRoomCatalog } from '../rooms/_hooks/useRoomCatalog';
 
 const RoomCard = React.memo(
   ({
     room,
+    image,
     isPriority,
     onBook,
   }: {
     room: CarouselRoom;
+    image?: string;
     isPriority: boolean;
     onBook: (room: CarouselRoom) => void;
   }) => {
     return (
       <div className="flex flex-col md:flex-row items-center justify-center">
         <div className="relative w-full max-w-150 h-75 md:h-101 rounded-[10px] overflow-hidden shadow-sm z-0 shrink-0">
-          <Image
-            src={room.image}
-            alt={`Фото номеру ${room.title}`}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 600px"
-            priority={isPriority}
-          />
+          {image ? (
+            <Image
+              src={image}
+              alt={`Фото номеру ${room.title}`}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 600px"
+              priority={isPriority}
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center bg-brand-surface text-sm text-brand-text-soft">
+              Фото відсутнє
+            </div>
+          )}
         </div>
 
         <div className="relative z-10 bg-white p-6 md:p-10 rounded-[8px] border border-gray-50 -mt-15 md:mt-0 md:-ml-25 w-[95%] md:w-125 md:h-71 flex flex-col justify-center">
@@ -111,6 +119,7 @@ const Dots = React.memo(
 Dots.displayName = 'Dots';
 
 export function RoomsCarousel() {
+  const { rooms, bookingRooms } = useRoomCatalog();
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
 
@@ -118,15 +127,26 @@ export function RoomsCarousel() {
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [initialRoomId, setInitialRoomId] = useState<string>();
 
-  const openBookingModal = useCallback((room: CarouselRoom) => {
-    const matchedRoom = ROOMS.find((candidate) => {
-      return candidate.title === room.title;
-    });
+  const roomImageByTitle = useMemo<Record<string, string>>(() => {
+    return Object.fromEntries(
+      rooms.map((room) => {
+        return [room.title, room.image];
+      }),
+    );
+  }, [rooms]);
 
-    setInitialRoomId(matchedRoom?.id);
-    setBookingSuccess(false);
-    setIsBookingOpen(true);
-  }, []);
+  const openBookingModal = useCallback(
+    (room: CarouselRoom) => {
+      const matchedRoom = bookingRooms.find((candidate) => {
+        return candidate.title === room.title;
+      });
+
+      setInitialRoomId(matchedRoom?.id);
+      setBookingSuccess(false);
+      setIsBookingOpen(true);
+    },
+    [bookingRooms],
+  );
 
   const closeBookingModal = useCallback(() => {
     setIsBookingOpen(false);
@@ -194,7 +214,12 @@ export function RoomsCarousel() {
               {CAROUSEL_ROOMS.map((room, index) => {
                 return (
                   <CarouselItem key={room.title} className="basis-full">
-                    <RoomCard room={room} isPriority={index === 0} onBook={openBookingModal} />
+                    <RoomCard
+                      room={room}
+                      image={roomImageByTitle[room.title]}
+                      isPriority={index === 0}
+                      onBook={openBookingModal}
+                    />
                   </CarouselItem>
                 );
               })}
@@ -221,9 +246,7 @@ export function RoomsCarousel() {
             }
           }}
           onSubmit={handleBookingSubmit}
-          rooms={ROOMS.map((room) => {
-            return { id: room.id, title: room.title, price: room.price };
-          })}
+          rooms={bookingRooms}
           initialRoomId={initialRoomId}
           success={bookingSuccess}
           onSuccessClose={closeBookingModal}

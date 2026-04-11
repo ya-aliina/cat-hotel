@@ -80,8 +80,22 @@ const reportImageInclude = {
 const roomCategoryInclude = {
   area: true,
   features: true,
+  images: {
+    orderBy: [{ isCover: 'desc' }, { sortOrder: 'asc' }],
+  },
+  perfectFor: {
+    orderBy: { id: 'asc' },
+  },
   rooms: true,
 } satisfies Prisma.RoomCategoryInclude;
+
+const roomCategoryImageInclude = {
+  roomCategory: true,
+} satisfies Prisma.RoomCategoryImageInclude;
+
+const perfectForItemInclude = {
+  roomCategories: true,
+} satisfies Prisma.PerfectForItemInclude;
 
 const roomInclude = {
   bookingItems: true,
@@ -268,6 +282,73 @@ const resources: Record<string, ResourceConfig> = {
     },
     deleteById: (id) => {
       return prisma.roomCategory.delete({ where: { id } });
+    },
+  },
+  'room-category-images': {
+    itemKey: 'roomCategoryImage',
+    listKey: 'roomCategoryImages',
+    list: () => {
+      return prisma.roomCategoryImage.findMany({
+        include: roomCategoryImageInclude,
+        orderBy: [{ roomCategoryId: 'asc' }, { isCover: 'desc' }, { sortOrder: 'asc' }],
+      });
+    },
+    create: (data) => {
+      return prisma.roomCategoryImage.create({
+        data: data as Prisma.RoomCategoryImageUncheckedCreateInput,
+        include: roomCategoryImageInclude,
+      });
+    },
+    getById: (id) => {
+      return prisma.roomCategoryImage.findUnique({
+        where: { id },
+        include: roomCategoryImageInclude,
+      });
+    },
+    updateById: (id, data) => {
+      return prisma.roomCategoryImage.update({
+        where: { id },
+        data: data as Prisma.RoomCategoryImageUncheckedUpdateInput,
+        include: roomCategoryImageInclude,
+      });
+    },
+    deleteById: (id) => {
+      return prisma.roomCategoryImage.delete({ where: { id }, include: roomCategoryImageInclude });
+    },
+  },
+  'perfect-for-items': {
+    itemKey: 'perfectForItem',
+    listKey: 'perfectForItems',
+    list: () => {
+      return prisma.perfectForItem.findMany({
+        include: perfectForItemInclude,
+        orderBy: { id: 'asc' },
+      });
+    },
+    create: (data) => {
+      return prisma.perfectForItem.create({
+        data: data as Prisma.PerfectForItemUncheckedCreateInput,
+        include: perfectForItemInclude,
+      });
+    },
+    getById: (id) => {
+      return prisma.perfectForItem.findUnique({
+        where: { id },
+        include: perfectForItemInclude,
+      });
+    },
+    updateById: (id, data) => {
+      return prisma.perfectForItem.update({
+        where: { id },
+        data: data as Prisma.PerfectForItemUncheckedUpdateInput,
+        include: perfectForItemInclude,
+      });
+    },
+    deleteById: (id) => {
+      return prisma.perfectForItem.delete({
+        where: { id },
+        include: perfectForItemInclude,
+      });
     },
   },
   rooms: {

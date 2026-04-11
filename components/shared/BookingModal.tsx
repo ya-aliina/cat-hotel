@@ -312,6 +312,7 @@ export function BookingModal({
                 width={128}
                 height={128}
                 className="object-contain rotate-135"
+                style={{ width: 'auto', height: 'auto' }}
               />
             </div>
 

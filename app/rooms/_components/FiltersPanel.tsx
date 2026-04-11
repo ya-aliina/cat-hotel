@@ -8,12 +8,11 @@ import { useFilterRoomArea } from '@/hooks/useFilterRoomArea';
 
 import { formatArea } from '../[id]/_utils/roomUtils';
 import { CheckboxFiltersSection } from './CheckboxFiltersSection';
-import type { CheckboxFilterOption, FiltersConfig, FiltersState } from './filters.types';
+import type { CheckboxFilterOption, FiltersState } from './filters.types';
 import { FilterSection } from './FilterSection';
 import { PriceFiltersSection } from './PriceFiltersSection';
 
 interface FiltersPanelProps {
-  config: FiltersConfig;
   draftFilters: FiltersState;
   onDraftFiltersChange: (value: FiltersState) => void;
   onApply: () => void;
@@ -21,7 +20,6 @@ interface FiltersPanelProps {
 }
 
 export const FiltersPanel: React.FC<FiltersPanelProps> = ({
-  config,
   draftFilters,
   onDraftFiltersChange,
   onApply,
@@ -56,14 +54,6 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
   const featureItems = React.useMemo<CheckboxFilterOption[]>(() => {
     return features
       .map((feature) => {
-        const matchedFeature = config.features.find((item) => {
-          return item.label === feature.name;
-        });
-
-        if (!matchedFeature) {
-          return null;
-        }
-
         return {
           id: String(feature.id),
           text: feature.name,
@@ -73,7 +63,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
       .filter((item): item is CheckboxFilterOption => {
         return item !== null;
       });
-  }, [config.features, features]);
+  }, [features]);
 
   const areaValueById = React.useMemo<Record<string, string>>(() => {
     return Object.fromEntries(
@@ -87,21 +77,13 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
     return Object.fromEntries(
       features
         .map((feature) => {
-          const matchedFeature = config.features.find((item) => {
-            return item.label === feature.name;
-          });
-
-          if (!matchedFeature) {
-            return null;
-          }
-
-          return [String(feature.id), matchedFeature.id] as const;
+          return [String(feature.id), String(feature.id)] as const;
         })
         .filter((item): item is readonly [string, string] => {
           return item !== null;
         }),
     );
-  }, [config.features, features]);
+  }, [features]);
 
   const updatePrice = React.useCallback((name: 'priceFrom' | 'priceTo', value: string) => {
     setPrice((prev) => {

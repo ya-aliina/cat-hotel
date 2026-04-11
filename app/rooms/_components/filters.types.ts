@@ -7,10 +7,6 @@ export type FiltersState = {
   features: string[];
 };
 
-export type FiltersConfig = {
-  features: readonly { id: string; label: string }[];
-};
-
 export type CheckboxFilterOption = {
   id: string;
   text: string;

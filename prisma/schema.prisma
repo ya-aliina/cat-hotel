@@ -91,10 +91,37 @@ model RoomCategory {
     depthCm     Int
     heightCm    Int
 
-    rooms    Room[]
-    features Feature[]
-    area     RoomArea  @relation(fields: [areaId], references: [id])
-    areaId   Int
+    rooms      Room[]
+    features   Feature[]
+    images     RoomCategoryImage[]
+    perfectFor PerfectForItem[]
+    area       RoomArea         @relation(fields: [areaId], references: [id])
+    areaId     Int
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model RoomCategoryImage {
+    id             Int          @id @default(autoincrement())
+    isCover        Boolean      @default(false)
+    url            String
+    sortOrder      Int          @default(0)
+    roomCategory   RoomCategory @relation(fields: [roomCategoryId], references: [id], onDelete: Cascade)
+    roomCategoryId Int
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([roomCategoryId, sortOrder])
+}
+
+model PerfectForItem {
+    id          Int    @id @default(autoincrement())
+    description String @unique
+    imageUrl    String
+
+    roomCategories RoomCategory[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

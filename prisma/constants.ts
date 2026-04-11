@@ -56,10 +56,11 @@ export const RoomAreas = [
 ];
 
 export const Features = [
-  { id: 1, name: 'Лежак', price: 0, imageUrl: '/icons/bed.svg' },
-  { id: 2, name: 'Кігтеточка', price: 0, imageUrl: '/icons/scratch.svg' },
-  { id: 3, name: 'Ігровий комплекс', price: 0, imageUrl: '/icons/complex.svg' },
-  { id: 4, name: 'Будиночок', price: 0, imageUrl: '/icons/house.svg' },
+  { id: 1, name: 'Лежак', price: 0, imageUrl: '/amenities/bed.svg' },
+  { id: 2, name: 'Кігтеточка', price: 0, imageUrl: '/amenities/scratcher.svg' },
+  { id: 3, name: 'Ігровий комплекс', price: 0, imageUrl: '/amenities/toy.svg' },
+  { id: 4, name: 'Будиночок', price: 0, imageUrl: '/amenities/house.svg' },
+  { id: 5, name: 'Пустий номер', price: 0, imageUrl: '/amenities/none.svg' },
 ];
 
 export const Services = [
@@ -93,8 +94,7 @@ export const RoomCategories = [
   {
     id: 1,
     name: 'Економ',
-    description:
-      'Затишний базовий номер для спокійного відпочинку котика. Розміри (ШхГхВ): 90х70х180 см',
+    description: 'Затишний базовий номер для спокійного відпочинку котика.',
     price: 100,
     widthCm: 90,
     depthCm: 70,
@@ -104,8 +104,7 @@ export const RoomCategories = [
   {
     id: 2,
     name: 'Економ плюс',
-    description:
-      "Більше простору та м'який лежак для комфортного сну. Розміри (ШхГхВ): 90х100х180 см",
+    description: "Більше простору та м'який лежак для комфортного сну.",
     price: 200,
     widthCm: 90,
     depthCm: 100,
@@ -115,8 +114,7 @@ export const RoomCategories = [
   {
     id: 3,
     name: 'Комфорт',
-    description:
-      'Оптимальний номер з ігровою зоною для активних хвостиків. Розміри (ШхГхВ): 100х125х180 см',
+    description: 'Оптимальний номер з ігровою зоною для активних хвостиків.',
     price: 250,
     widthCm: 100,
     depthCm: 125,
@@ -126,8 +124,7 @@ export const RoomCategories = [
   {
     id: 4,
     name: 'Сьют',
-    description:
-      'Просторий номер з підвищеним комфортом для довгого проживання. Розміри (ШхГхВ): 125х125х180 см',
+    description: 'Просторий номер з підвищеним комфортом для довгого проживання.',
     price: 350,
     widthCm: 125,
     depthCm: 125,
@@ -137,8 +134,7 @@ export const RoomCategories = [
   {
     id: 5,
     name: 'Люкс',
-    description:
-      'Преміальний номер з будиночком та ігровим комплексом. Розміри (ШхГхВ): 160х160х180 см',
+    description: 'Преміальний номер з будиночком та ігровим комплексом.',
     price: 500,
     widthCm: 160,
     depthCm: 160,
@@ -148,8 +144,7 @@ export const RoomCategories = [
   {
     id: 6,
     name: 'Супер-Люкс',
-    description:
-      'Максимальний простір та топове оснащення для найвибагливіших гостей. Розміри (ШхГхВ): 180х160х180 см',
+    description: 'Максимальний простір та топове оснащення для найвибагливіших гостей.',
     price: 600,
     widthCm: 180,
     depthCm: 160,
@@ -159,11 +154,170 @@ export const RoomCategories = [
 ];
 
 export const RoomCategoryFeatures = [
+  { roomCategoryId: 1, featureIds: [5] },
   { roomCategoryId: 2, featureIds: [1, 2] },
   { roomCategoryId: 3, featureIds: [1, 2, 3] },
   { roomCategoryId: 4, featureIds: [1, 2, 3] },
   { roomCategoryId: 5, featureIds: [1, 2, 3, 4] },
   { roomCategoryId: 6, featureIds: [1, 2, 3, 4] },
+];
+
+export const RoomCategoryImages = [
+  { id: 1, roomCategoryId: 1, sortOrder: 0, isCover: true, url: '/rooms/economy.jpg' },
+  { id: 2, roomCategoryId: 1, sortOrder: 1, isCover: false, url: '/amenities/photos/none.jpg' },
+  { id: 3, roomCategoryId: 1, sortOrder: 2, isCover: false, url: '/room1.jpg' },
+  { id: 4, roomCategoryId: 1, sortOrder: 3, isCover: false, url: '/room2.jpg' },
+
+  { id: 5, roomCategoryId: 2, sortOrder: 0, isCover: true, url: '/rooms/economy-plus.jpg' },
+  { id: 6, roomCategoryId: 2, sortOrder: 1, isCover: false, url: '/amenities/photos/bed.jpg' },
+  {
+    id: 7,
+    roomCategoryId: 2,
+    sortOrder: 2,
+    isCover: false,
+    url: '/amenities/photos/scratcher-cat.jpg',
+  },
+  { id: 8, roomCategoryId: 2, sortOrder: 3, isCover: false, url: '/room3.jpg' },
+
+  { id: 9, roomCategoryId: 3, sortOrder: 0, isCover: true, url: '/rooms/comfort.jpg' },
+  { id: 10, roomCategoryId: 3, sortOrder: 1, isCover: false, url: '/amenities/photos/bed.jpg' },
+  {
+    id: 11,
+    roomCategoryId: 3,
+    sortOrder: 2,
+    isCover: false,
+    url: '/amenities/photos/scratcher-cat.jpg',
+  },
+  { id: 12, roomCategoryId: 3, sortOrder: 3, isCover: false, url: '/amenities/photos/toy-cat.jpg' },
+
+  { id: 13, roomCategoryId: 4, sortOrder: 0, isCover: true, url: '/rooms/suite.jpg' },
+  { id: 14, roomCategoryId: 4, sortOrder: 1, isCover: false, url: '/amenities/photos/bed.jpg' },
+  {
+    id: 15,
+    roomCategoryId: 4,
+    sortOrder: 2,
+    isCover: false,
+    url: '/amenities/photos/scratcher-cat.jpg',
+  },
+  { id: 16, roomCategoryId: 4, sortOrder: 3, isCover: false, url: '/amenities/photos/toy-cat.jpg' },
+
+  { id: 17, roomCategoryId: 5, sortOrder: 0, isCover: true, url: '/rooms/lux.jpg' },
+  { id: 18, roomCategoryId: 5, sortOrder: 1, isCover: false, url: '/amenities/photos/house.jpg' },
+  { id: 19, roomCategoryId: 5, sortOrder: 2, isCover: false, url: '/amenities/photos/toy-cat.jpg' },
+  { id: 20, roomCategoryId: 5, sortOrder: 3, isCover: false, url: '/room1.jpg' },
+
+  { id: 21, roomCategoryId: 6, sortOrder: 0, isCover: true, url: '/rooms/super-lux.jpg' },
+  { id: 22, roomCategoryId: 6, sortOrder: 1, isCover: false, url: '/amenities/photos/house.jpg' },
+  { id: 23, roomCategoryId: 6, sortOrder: 2, isCover: false, url: '/amenities/photos/toy-cat.jpg' },
+  {
+    id: 24,
+    roomCategoryId: 6,
+    sortOrder: 3,
+    isCover: false,
+    url: '/amenities/photos/scratcher-cat.jpg',
+  },
+];
+
+export const PerfectForItems = [
+  {
+    id: 1,
+    imageUrl: '/marketing-icons/clock.svg',
+    description: 'Короткого перебування (1-3 дні)',
+  },
+  {
+    id: 2,
+    imageUrl: '/marketing-icons/heart.svg',
+    description: 'Спокійних або літніх котиків',
+  },
+  {
+    id: 3,
+    imageUrl: '/marketing-icons/package.svg',
+    description: 'Розміщення з власними улюбленими речами',
+  },
+  {
+    id: 4,
+    imageUrl: '/marketing-icons/cat.svg',
+    description: 'Котиків середнього розміру',
+  },
+  {
+    id: 5,
+    imageUrl: '/marketing-icons/bed-double.svg',
+    description: "Любителів міцно поспати (м'який лежак включено)",
+  },
+  {
+    id: 6,
+    imageUrl: '/marketing-icons/calendar-days.svg',
+    description: 'Перебування на вихідні (2-4 дні)',
+  },
+  {
+    id: 7,
+    imageUrl: '/marketing-icons/activity.svg',
+    description: 'Активних та енергійних улюбленців',
+  },
+  {
+    id: 8,
+    imageUrl: '/marketing-icons/gamepad-2.svg',
+    description: 'Тиха забава (є ігровий комплекс)',
+  },
+  {
+    id: 9,
+    imageUrl: '/marketing-icons/sun-medium.svg',
+    description: 'Збалансованого відпочинку до одного тижня',
+  },
+  {
+    id: 10,
+    imageUrl: '/marketing-icons/scaling.svg',
+    description: 'Великих порід (Мейн-кун, Бенгал)',
+  },
+  {
+    id: 11,
+    imageUrl: '/marketing-icons/users.svg',
+    description: 'Спільного проживання 2-х котиків з однієї родини',
+  },
+  {
+    id: 12,
+    imageUrl: '/marketing-icons/calendar-check.svg',
+    description: 'Тривалого перебування (від 7 днів)',
+  },
+  {
+    id: 13,
+    imageUrl: '/marketing-icons/home.svg',
+    description: 'Цінителів приватності (є особистий будиночок)',
+  },
+  {
+    id: 14,
+    imageUrl: '/marketing-icons/shield-check.svg',
+    description: 'Тривожних хвостиків, що люблять тишу та затишок',
+  },
+  {
+    id: 15,
+    imageUrl: '/marketing-icons/maximize.svg',
+    description: 'Великого простору для ігор та відпочинку',
+  },
+  {
+    id: 16,
+    imageUrl: '/marketing-icons/crown.svg',
+    description: 'VIP-гостей та найвибагливіших пухнастиків',
+  },
+  {
+    id: 17,
+    imageUrl: '/marketing-icons/expand.svg',
+    description: 'Максимального простору (можна вільно бігати)',
+  },
+  {
+    id: 18,
+    imageUrl: '/marketing-icons/users-2.svg',
+    description: 'Великих котячих сімей (до 4-х котиків)',
+  },
+];
+
+export const RoomCategoryPerfectForItems = [
+  { roomCategoryId: 1, perfectForIds: [1, 2, 3] },
+  { roomCategoryId: 2, perfectForIds: [4, 5, 6] },
+  { roomCategoryId: 3, perfectForIds: [7, 8, 9] },
+  { roomCategoryId: 4, perfectForIds: [10, 11, 12] },
+  { roomCategoryId: 5, perfectForIds: [13, 14, 15] },
+  { roomCategoryId: 6, perfectForIds: [16, 17, 18] },
 ];
 
 export const Rooms = [
