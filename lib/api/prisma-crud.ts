@@ -54,7 +54,7 @@ const userSelect = {
   news: true,
   reports: true,
   reviews: true,
-  verificationCode: true,
+  verificationCodes: true,
 } satisfies Prisma.UserSelect;
 
 const catInclude = {

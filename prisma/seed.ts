@@ -21,6 +21,34 @@ import {
 } from './constants';
 import { prisma } from './prisma-client';
 
+const tablesWithExplicitIds = [
+  'User',
+  'RoomArea',
+  'Feature',
+  'PerfectForItem',
+  'Service',
+  'RoomCategory',
+  'RoomCategoryImage',
+  'Room',
+  'Cat',
+  'Booking',
+  'BookingItem',
+  'BookingItemService',
+  'Review',
+  'News',
+  'CatReport',
+  'ReportImage',
+  'VerificationCode',
+] as const;
+
+async function resetIdSequences() {
+  for (const tableName of tablesWithExplicitIds) {
+    await prisma.$executeRawUnsafe(
+      `SELECT setval(pg_get_serial_sequence('"${tableName}"', 'id'), COALESCE((SELECT MAX(id) FROM "${tableName}"), 1), (SELECT COUNT(*) > 0 FROM "${tableName}"));`,
+    );
+  }
+}
+
 async function up() {
   await prisma.user.createMany({
     data: Users,
@@ -119,6 +147,8 @@ async function up() {
   await prisma.verificationCode.createMany({
     data: VerificationCodes,
   });
+
+  await resetIdSequences();
 }
 
 async function down() {

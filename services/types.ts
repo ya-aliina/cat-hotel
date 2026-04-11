@@ -3,19 +3,20 @@ export type DecimalString = string;
 
 export type Role = 'USER' | 'EMPLOYEE' | 'ADMIN';
 export type BookingStatus = 'PENDING' | 'SUCCEEDED' | 'CANCELLED';
+export type VerificationCodePurpose = 'EMAIL_VERIFICATION' | 'PASSWORD_RESET';
 
 export interface UserBase {
   createdAt: DateTimeString;
   email: string;
   id: number;
   name: string;
-  phone: string;
+  phone: string | null;
   provider: string | null;
   providerId: string | null;
   role: Role;
   surname: string;
   updatedAt: DateTimeString;
-  verified: DateTimeString;
+  verified: DateTimeString | null;
 }
 
 export interface CatBase {
@@ -158,8 +159,11 @@ export interface NewsBase {
 
 export interface VerificationCodeBase {
   code: string;
+  consumedAt: DateTimeString | null;
   createdAt: DateTimeString;
+  expiresAt: DateTimeString;
   id: number;
+  purpose: VerificationCodePurpose;
   userId: number;
 }
 
@@ -172,7 +176,7 @@ export interface UserDto extends PublicUser {
   news: NewsBase[];
   reports: CatReportBase[];
   reviews: ReviewBase[];
-  verificationCode: VerificationCodeBase | null;
+  verificationCodes: VerificationCodeBase[];
 }
 
 export interface OwnerDto extends PublicUser {
@@ -263,12 +267,12 @@ export interface UserCreateInput {
   email: string;
   name: string;
   password: string;
-  phone: string;
+  phone?: string | null;
   provider?: string | null;
   providerId?: string | null;
   role?: Role;
   surname: string;
-  verified: DateTimeString;
+  verified?: DateTimeString | null;
 }
 
 export type UserUpdateInput = Partial<UserCreateInput>;
@@ -406,6 +410,9 @@ export type NewsUpdateInput = Partial<NewsCreateInput>;
 
 export interface VerificationCodeCreateInput {
   code: string;
+  consumedAt?: DateTimeString | null;
+  expiresAt: DateTimeString;
+  purpose: VerificationCodePurpose;
   userId: number;
 }
 

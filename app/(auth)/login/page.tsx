@@ -1,6 +1,8 @@
 'use client';
 
 import Image from 'next/image';
+import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
 import { AuthMode } from '@/app/(auth)/login/_types/types';
@@ -8,14 +10,18 @@ import { AuthMode } from '@/app/(auth)/login/_types/types';
 import { ForgotForm } from './_components/ForgotForm';
 import { LoginForm } from './_components/LoginForm';
 import { RegisterForm } from './_components/RegisterForm';
+import { ResendVerificationForm } from './_components/ResendVerificationForm';
 
-export default function LoginPage() {
+function LoginPageContent() {
+  const searchParams = useSearchParams();
   const [mode, setMode] = useState<AuthMode>('login');
+  const oauthError = searchParams.get('error');
 
   const titles: Record<AuthMode, string> = {
     login: 'Увійти в кабінет',
     register: 'Реєстрація',
     forgot: 'Відновлення пароля',
+    verify: 'Підтвердження email',
   };
 
   return (
@@ -48,9 +54,10 @@ export default function LoginPage() {
             <h1 className="text-[28px] font-bold text-brand-text">{titles[mode]}</h1>
           </div>
 
-          {mode === 'login' && <LoginForm onSwitch={setMode} />}
+          {mode === 'login' && <LoginForm onSwitch={setMode} oauthError={oauthError} />}
           {mode === 'register' && <RegisterForm onSwitch={setMode} />}
           {mode === 'forgot' && <ForgotForm onSwitch={setMode} />}
+          {mode === 'verify' && <ResendVerificationForm onSwitch={setMode} />}
         </div>
       </div>
 
@@ -58,5 +65,13 @@ export default function LoginPage() {
         © 2026 Котейка. Всі права захищені.
       </div>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginPageContent />
+    </Suspense>
   );
 }

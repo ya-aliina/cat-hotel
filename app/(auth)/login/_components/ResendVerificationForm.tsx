@@ -10,7 +10,7 @@ import { type EmailRequestData, emailRequestSchema } from '@/lib/auth-schemas';
 
 import type { AuthFormProps } from '../_types/types';
 
-export const ForgotForm = ({ onSwitch }: AuthFormProps) => {
+export const ResendVerificationForm = ({ onSwitch }: AuthFormProps) => {
   const [cooldownSeconds, setCooldownSeconds] = useState<number | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,7 +32,7 @@ export const ForgotForm = ({ onSwitch }: AuthFormProps) => {
     setSuccessMessage(null);
     setIsSubmitting(true);
 
-    const response = await fetch('/api/auth/forgot-password', {
+    const response = await fetch('/api/auth/resend-verification', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -53,21 +53,19 @@ export const ForgotForm = ({ onSwitch }: AuthFormProps) => {
 
     if (!response.ok) {
       setCooldownSeconds(responseData?.retryAfterSeconds ?? null);
-      setFormError(responseData?.error ?? 'Не вдалося надіслати інструкцію.');
+      setFormError(responseData?.error ?? 'Не вдалося надіслати лист підтвердження.');
       return;
     }
 
     setPreviewUrl(responseData?.previewUrl ?? null);
-    setSuccessMessage(
-      responseData?.message ?? 'Якщо акаунт існує, ми надіслали інструкцію для відновлення.',
-    );
+    setSuccessMessage(responseData?.message ?? 'Лист підтвердження надіслано.');
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="space-y-5">
         <p className="text-gray-400 text-sm text-center italic mb-4">
-          Ми надішлемо інструкцію на ваш E-mail
+          Вкажіть email, і ми повторно надішлемо лист для підтвердження акаунта
         </p>
         <Input
           type="email"
@@ -82,7 +80,7 @@ export const ForgotForm = ({ onSwitch }: AuthFormProps) => {
             href={previewUrl}
             className="block px-4 text-sm font-medium text-brand-orange transition-colors hover:text-brand-text"
           >
-            Відкрити посилання для зміни пароля
+            Відкрити посилання для підтвердження email
           </a>
         )}
         {cooldownSeconds && (
@@ -98,7 +96,7 @@ export const ForgotForm = ({ onSwitch }: AuthFormProps) => {
           className="min-w-48 bg-brand-orange text-white"
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Надсилаємо...' : 'Надіслати'}
+          {isSubmitting ? 'Надсилаємо...' : 'Надіслати лист'}
         </PawButton>
         <button
           type="button"

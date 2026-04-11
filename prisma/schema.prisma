@@ -19,16 +19,21 @@ enum BookingStatus {
     CANCELLED
 }
 
+enum VerificationCodePurpose {
+    EMAIL_VERIFICATION
+    PASSWORD_RESET
+}
+
 model User {
     id       Int    @id @default(autoincrement())
     name     String
     surname  String
     email    String @unique
-    phone    String
+    phone    String?
     password String
 
-    role Role @default(USER)
-    verified DateTime
+    role     Role      @default(USER)
+    verified DateTime?
 
     provider   String? // Для OAuth (наприклад, "google", "facebook")
     providerId String? // ID користувача в провайдері OAuth
@@ -42,7 +47,7 @@ model User {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    verificationCode VerificationCode?
+    verificationCodes VerificationCode[]
 }
 
 model Cat {
@@ -267,13 +272,17 @@ model News {
 }
 
 model VerificationCode {
-    id   Int    @id @default(autoincrement())
-    code String @unique
+    id        Int                     @id @default(autoincrement())
+    code      String                  @unique
+    purpose   VerificationCodePurpose
+    expiresAt DateTime
+    consumedAt DateTime?
 
-    user   User @relation(fields: [userId], references: [id])
-    userId Int  @unique
+    user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId Int
 
     createdAt DateTime @default(now())
 
+    @@index([userId, purpose])
     @@unique([code, userId])
 }

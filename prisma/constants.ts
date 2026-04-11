@@ -440,11 +440,4 @@ export const ReportImages = [
   { id: 2, url: '/amenities/photos/scratcher-cat.jpg', reportId: 1 },
 ];
 
-export const VerificationCodes = [
-  {
-    id: 1,
-    code: 'CATHOTEL-VERIFY-0004',
-    userId: 4,
-    createdAt: new Date('2026-04-10T09:15:00.000Z'),
-  },
-];
+export const VerificationCodes = [];

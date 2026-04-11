@@ -1,16 +1,25 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { signOut } from 'next-auth/react';
+import { useState } from 'react';
 
 import { PawButton } from '@/components/ui/PawButton';
-import { signOut } from '@/lib/auth';
 
 export function LogoutButton() {
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleLogout = () => {
-    signOut();
-    router.push('/');
+  const handleLogout = async () => {
+    setIsSubmitting(true);
+
+    const result = await signOut({
+      callbackUrl: '/',
+      redirect: false,
+    });
+
+    router.push(result.url ?? '/');
+    router.refresh();
   };
 
   return (
@@ -19,8 +28,9 @@ export function LogoutButton() {
       variant="accent"
       className="bg-brand-orange text-white"
       onClick={handleLogout}
+      disabled={isSubmitting}
     >
-      Вийти
+      {isSubmitting ? 'Виходимо...' : 'Вийти'}
     </PawButton>
   );
 }
