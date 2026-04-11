@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { BookingModal } from '@/components/shared/BookingModal';
@@ -15,27 +16,51 @@ import {
 import { PawButton } from '@/components/ui/PawButton';
 import { cn } from '@/lib/utils';
 
-import { CAROUSEL_ROOMS, type CarouselRoom } from '../_data/carousel-rooms';
 import { useRoomCatalog } from '../rooms/_hooks/useRoomCatalog';
+import type { Room } from '../rooms/_types/room';
+
+type CarouselRoom = {
+  description: string;
+  features: string[];
+  id: string;
+  image: string;
+  slug: string;
+  title: string;
+};
 
 const RoomCard = React.memo(
   ({
     room,
-    image,
     isPriority,
     onBook,
   }: {
     room: CarouselRoom;
-    image?: string;
     isPriority: boolean;
     onBook: (room: CarouselRoom) => void;
   }) => {
+    const router = useRouter();
+
+    const handleNavigateToDetails = () => {
+      router.push(`/rooms/${room.slug}`);
+    };
+
     return (
-      <div className="flex flex-col md:flex-row items-center justify-center">
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={handleNavigateToDetails}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            handleNavigateToDetails();
+          }
+        }}
+        className="flex flex-col md:flex-row items-center justify-center cursor-pointer"
+      >
         <div className="relative w-full max-w-150 h-75 md:h-101 rounded-[10px] overflow-hidden shadow-sm z-0 shrink-0">
-          {image ? (
+          {room.image ? (
             <Image
-              src={image}
+              src={room.image}
               alt={`Фото номеру ${room.title}`}
               fill
               className="object-cover"
@@ -65,16 +90,25 @@ const RoomCard = React.memo(
               })}
             </ul>
 
-            <PawButton
-              type="button"
-              variant="accent"
-              className="bg-brand-orange text-white py-2 shadow-lg"
-              onClick={() => {
-                onBook(room);
+            <div
+              onClick={(event) => {
+                event.stopPropagation();
+              }}
+              onKeyDown={(event) => {
+                event.stopPropagation();
               }}
             >
-              Забронювати
-            </PawButton>
+              <PawButton
+                type="button"
+                variant="accent"
+                className="bg-brand-orange text-white py-2 shadow-lg"
+                onClick={() => {
+                  onBook(room);
+                }}
+              >
+                Забронювати
+              </PawButton>
+            </div>
           </div>
         </div>
       </div>
@@ -127,12 +161,21 @@ export function RoomsCarousel() {
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [initialRoomId, setInitialRoomId] = useState<string>();
 
-  const roomImageByTitle = useMemo<Record<string, string>>(() => {
-    return Object.fromEntries(
-      rooms.map((room) => {
-        return [room.title, room.image];
-      }),
-    );
+  const carouselRooms = useMemo<CarouselRoom[]>(() => {
+    return rooms.map((room: Room) => {
+      return {
+        id: room.id,
+        title: room.title,
+        description: room.description,
+        image: room.image,
+        slug: room.slug,
+        features: [
+          `Площа: ${room.area.toString().replace('.', ',')} м²`,
+          `Розміри (ШхГхВ): ${room.size ? `${room.size} см` : 'Не вказано'}`,
+          `Ціна за добу: ${room.price}₴`,
+        ],
+      };
+    });
   }, [rooms]);
 
   const openBookingModal = useCallback(
@@ -211,22 +254,17 @@ export function RoomsCarousel() {
         <div className="relative z-10">
           <Carousel setApi={setApi} opts={carouselOpts} className="w-full">
             <CarouselContent>
-              {CAROUSEL_ROOMS.map((room, index) => {
+              {carouselRooms.map((room, index) => {
                 return (
-                  <CarouselItem key={room.title} className="basis-full">
-                    <RoomCard
-                      room={room}
-                      image={roomImageByTitle[room.title]}
-                      isPriority={index === 0}
-                      onBook={openBookingModal}
-                    />
+                  <CarouselItem key={room.id} className="basis-full">
+                    <RoomCard room={room} isPriority={index === 0} onBook={openBookingModal} />
                   </CarouselItem>
                 );
               })}
             </CarouselContent>
 
             <div className="flex items-center justify-between mt-8 relative min-h-12">
-              <Dots count={CAROUSEL_ROOMS.length} current={current} onDotClick={handleDotClick} />
+              <Dots count={carouselRooms.length} current={current} onDotClick={handleDotClick} />
 
               <div className="hidden md:flex gap-4 ml-auto">
                 <CarouselPrevious className="static h-12 w-12 translate-y-0 border-none bg-white shadow-sm hover:bg-brand-yellow hover:text-white transition-all" />
