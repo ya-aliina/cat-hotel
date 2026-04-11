@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
 import {
   Carousel,
@@ -13,9 +13,9 @@ import {
 } from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
 
-import { type Review, REVIEWS } from '../_data/reviews';
+import type { HomePageReview } from './reviews-types';
 
-const ReviewCard = React.memo(({ review }: { review: Review }) => {
+const ReviewCard = memo(({ review }: { review: HomePageReview }) => {
   return (
     <div className="bg-white rounded-[8px] p-6 lg:p-7.5 shadow-[0px_4px_20px_rgba(0,0,0,0.03)] border border-gray-50 h-full md:h-51.5 flex flex-col justify-between">
       <div className="flex gap-4 lg:gap-6">
@@ -48,7 +48,7 @@ const ReviewCard = React.memo(({ review }: { review: Review }) => {
 });
 ReviewCard.displayName = 'ReviewCard';
 
-const Dots = React.memo(
+const Dots = memo(
   ({
     count,
     current,
@@ -84,7 +84,11 @@ const Dots = React.memo(
 );
 Dots.displayName = 'Dots';
 
-export function ReviewsCarousel() {
+type ReviewsCarouselProps = {
+  reviews: HomePageReview[];
+};
+
+export function ReviewsCarousel({ reviews }: ReviewsCarouselProps) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
@@ -126,6 +130,12 @@ export function ReviewsCarousel() {
     [api],
   );
 
+  const hasReviews = reviews.length > 0;
+
+  if (!hasReviews) {
+    return null;
+  }
+
   return (
     <section id="reviews" className="w-full relative overflow-hidden py-16 md:py-24 scroll-mt-24">
       <div className="absolute top-3 -right-10 md:top-3 md:right-0 lg:-right-5 z-0 pointer-events-none rotate-[-15deg]">
@@ -146,7 +156,7 @@ export function ReviewsCarousel() {
       <div className="relative z-10 w-full">
         <Carousel setApi={setApi} opts={carouselOpts} className="w-full">
           <CarouselContent className="-ml-4 pl-4 xl:pl-[calc((100vw-1200px)/2+1rem)]">
-            {REVIEWS.map((review) => {
+            {reviews.map((review) => {
               return (
                 <CarouselItem key={review.id} className="pl-4 basis-[90%] md:basis-117.5 py-4">
                   <ReviewCard review={review} />
