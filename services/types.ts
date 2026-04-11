@@ -1,139 +1,368 @@
-import type {
-  Booking,
-  BookingItem,
-  BookingItemService,
-  Cat,
-  CatReport,
-  Feature,
-  News,
-  Prisma,
-  ReportImage,
-  Review,
-  Room,
-  RoomArea,
-  RoomCategory,
-  Service,
-  User,
-  VerificationCode,
-} from '@prisma/client';
+export type DateTimeString = string;
+export type DecimalString = string;
 
-export type PublicUser = Omit<User, 'password'>;
+export type Role = 'USER' | 'EMPLOYEE' | 'ADMIN';
+export type BookingStatus = 'PENDING' | 'SUCCEEDED' | 'CANCELLED';
 
-export type CatSummary = Pick<
-  Cat,
-  'id' | 'name' | 'breed' | 'birthDate' | 'notes' | 'ownerId' | 'createdAt' | 'updatedAt'
->;
+export interface UserBase {
+  createdAt: DateTimeString;
+  email: string;
+  id: number;
+  name: string;
+  phone: string;
+  provider: string | null;
+  providerId: string | null;
+  role: Role;
+  surname: string;
+  updatedAt: DateTimeString;
+  verified: DateTimeString;
+}
 
-export type UserDto = PublicUser & {
-  bookings: Booking[];
+export interface CatBase {
+  birthDate: DateTimeString | null;
+  breed: string | null;
+  createdAt: DateTimeString;
+  id: number;
+  name: string;
+  notes: string | null;
+  ownerId: number;
+  updatedAt: DateTimeString;
+}
+
+export interface CatReportBase {
+  catId: number;
+  date: DateTimeString;
+  employeeId: number;
+  id: number;
+  notes: string;
+}
+
+export interface ReportImageBase {
+  id: number;
+  reportId: number;
+  url: string;
+}
+
+export interface RoomAreaBase {
+  createdAt: DateTimeString;
+  id: number;
+  updatedAt: DateTimeString;
+  value: number;
+}
+
+export interface RoomCategoryBase {
+  areaId: number;
+  createdAt: DateTimeString;
+  depthCm: number;
+  description: string | null;
+  heightCm: number;
+  id: number;
+  name: string;
+  price: DecimalString;
+  updatedAt: DateTimeString;
+  widthCm: number;
+}
+
+export interface RoomBase {
+  categoryId: number;
+  createdAt: DateTimeString;
+  id: number;
+  name: string;
+  updatedAt: DateTimeString;
+}
+
+export interface FeatureBase {
+  createdAt: DateTimeString;
+  id: number;
+  imageUrl: string;
+  name: string;
+  price: DecimalString;
+  updatedAt: DateTimeString;
+}
+
+export interface ServiceBase {
+  createdAt: DateTimeString;
+  description: string | null;
+  id: number;
+  name: string;
+  price: DecimalString;
+  updatedAt: DateTimeString;
+}
+
+export interface ReviewBase {
+  bookingId: number | null;
+  comment: string | null;
+  createdAt: DateTimeString;
+  id: number;
+  rating: number;
+  updatedAt: DateTimeString;
+  userId: number;
+}
+
+export interface BookingItemBase {
+  bookingId: number;
+  catId: number;
+  id: number;
+  priceAtBooking: DecimalString;
+  roomId: number;
+}
+
+export interface BookingItemServiceBase {
+  bookingItemId: number;
+  id: number;
+  price: DecimalString;
+  quantity: number;
+  serviceId: number;
+}
+
+export interface BookingBase {
+  createdAt: DateTimeString;
+  endDate: DateTimeString;
+  id: number;
+  paymentId: string | null;
+  startDate: DateTimeString;
+  status: BookingStatus;
+  totalPrice: DecimalString;
+  updatedAt: DateTimeString;
+  userId: number;
+}
+
+export interface NewsBase {
+  authorId: number;
+  content: string;
+  createdAt: DateTimeString;
+  id: number;
+  imageUrl: string | null;
+  isPublished: boolean;
+  title: string;
+  updatedAt: DateTimeString;
+}
+
+export interface VerificationCodeBase {
+  code: string;
+  createdAt: DateTimeString;
+  id: number;
+  userId: number;
+}
+
+export type PublicUser = UserBase;
+export type CatSummary = CatBase;
+
+export interface UserDto extends PublicUser {
+  bookings: BookingBase[];
   cats: CatSummary[];
-  news: News[];
-  reports: CatReport[];
-  reviews: Review[];
-  verificationCode: VerificationCode | null;
-};
+  news: NewsBase[];
+  reports: CatReportBase[];
+  reviews: ReviewBase[];
+  verificationCode: VerificationCodeBase | null;
+}
 
-export type OwnerDto = PublicUser & {
+export interface OwnerDto extends PublicUser {
   cats: CatSummary[];
-};
+}
 
-export type CatDto = Cat & {
-  bookingItems: BookingItem[];
+export interface CatDto extends CatBase {
+  bookingItems: BookingItemBase[];
   owner: OwnerDto;
-  reports: CatReport[];
-};
+  reports: CatReportBase[];
+}
 
-export type CatReportDto = CatReport & {
-  cat: Cat;
+export interface CatReportDto extends CatReportBase {
+  cat: CatBase;
   employee: PublicUser;
-  images: ReportImage[];
-};
+  images: ReportImageBase[];
+}
 
-export type ReportImageDto = ReportImage & {
-  report: CatReport;
-};
+export interface ReportImageDto extends ReportImageBase {
+  report: CatReportBase;
+}
 
-export type RoomCategoryDto = RoomCategory & {
-  area: RoomArea;
-  features: Feature[];
-  rooms: Room[];
-};
+export interface RoomCategoryDto extends RoomCategoryBase {
+  area: RoomAreaBase;
+  features: FeatureBase[];
+  rooms: RoomBase[];
+}
 
-export type RoomDto = Room & {
-  bookingItems: BookingItem[];
-  category: RoomCategory;
-};
+export interface RoomDto extends RoomBase {
+  bookingItems: BookingItemBase[];
+  category: RoomCategoryBase;
+}
 
-export type RoomAreaDto = RoomArea & {
-  categories: RoomCategory[];
-};
+export interface RoomAreaDto extends RoomAreaBase {
+  categories: RoomCategoryBase[];
+}
 
-export type FeatureDto = Feature & {
-  roomCategories: RoomCategory[];
-};
+export interface FeatureDto extends FeatureBase {
+  roomCategories: RoomCategoryBase[];
+}
 
-export type ServiceDto = Service & {
-  bookingItemServices: BookingItemService[];
-};
+export interface ServiceDto extends ServiceBase {
+  bookingItemServices: BookingItemServiceBase[];
+}
 
-export type ReviewDto = Review & {
-  booking: Booking | null;
+export interface ReviewDto extends ReviewBase {
+  booking: BookingBase | null;
   user: PublicUser;
-};
+}
 
-export type BookingItemDto = BookingItem & {
-  booking: Booking;
-  cat: Cat;
-  room: Room;
-  services: BookingItemService[];
-};
+export interface BookingItemDto extends BookingItemBase {
+  booking: BookingBase;
+  cat: CatBase;
+  room: RoomBase;
+  services: BookingItemServiceBase[];
+}
 
-export type BookingItemServiceDto = BookingItemService & {
-  bookingItem: BookingItem;
-  service: Service;
-};
+export interface BookingItemServiceDto extends BookingItemServiceBase {
+  bookingItem: BookingItemBase;
+  service: ServiceBase;
+}
 
-export type BookingDto = Booking & {
-  bookingItems: BookingItem[];
-  review: Review | null;
+export interface BookingDto extends BookingBase {
+  bookingItems: BookingItemBase[];
+  review: ReviewBase | null;
   user: PublicUser;
-};
+}
 
-export type NewsDto = News & {
+export interface NewsDto extends NewsBase {
   author: PublicUser;
-};
+}
 
-export type VerificationCodeDto = VerificationCode & {
+export interface VerificationCodeDto extends VerificationCodeBase {
   user: PublicUser;
-};
+}
 
-export type UserCreateInput = Prisma.UserUncheckedCreateInput;
-export type UserUpdateInput = Prisma.UserUncheckedUpdateInput;
-export type CatCreateInput = Prisma.CatUncheckedCreateInput;
-export type CatUpdateInput = Prisma.CatUncheckedUpdateInput;
-export type CatReportCreateInput = Prisma.CatReportUncheckedCreateInput;
-export type CatReportUpdateInput = Prisma.CatReportUncheckedUpdateInput;
-export type ReportImageCreateInput = Prisma.ReportImageUncheckedCreateInput;
-export type ReportImageUpdateInput = Prisma.ReportImageUncheckedUpdateInput;
-export type RoomCategoryCreateInput = Prisma.RoomCategoryUncheckedCreateInput;
-export type RoomCategoryUpdateInput = Prisma.RoomCategoryUncheckedUpdateInput;
-export type RoomCreateInput = Prisma.RoomUncheckedCreateInput;
-export type RoomUpdateInput = Prisma.RoomUncheckedUpdateInput;
-export type RoomAreaCreateInput = Prisma.RoomAreaUncheckedCreateInput;
-export type RoomAreaUpdateInput = Prisma.RoomAreaUncheckedUpdateInput;
-export type FeatureCreateInput = Prisma.FeatureUncheckedCreateInput;
-export type FeatureUpdateInput = Prisma.FeatureUncheckedUpdateInput;
-export type ServiceCreateInput = Prisma.ServiceUncheckedCreateInput;
-export type ServiceUpdateInput = Prisma.ServiceUncheckedUpdateInput;
-export type ReviewCreateInput = Prisma.ReviewUncheckedCreateInput;
-export type ReviewUpdateInput = Prisma.ReviewUncheckedUpdateInput;
-export type BookingItemCreateInput = Prisma.BookingItemUncheckedCreateInput;
-export type BookingItemUpdateInput = Prisma.BookingItemUncheckedUpdateInput;
-export type BookingItemServiceCreateInput = Prisma.BookingItemServiceUncheckedCreateInput;
-export type BookingItemServiceUpdateInput = Prisma.BookingItemServiceUncheckedUpdateInput;
-export type BookingCreateInput = Prisma.BookingUncheckedCreateInput;
-export type BookingUpdateInput = Prisma.BookingUncheckedUpdateInput;
-export type NewsCreateInput = Prisma.NewsUncheckedCreateInput;
-export type NewsUpdateInput = Prisma.NewsUncheckedUpdateInput;
-export type VerificationCodeCreateInput = Prisma.VerificationCodeUncheckedCreateInput;
-export type VerificationCodeUpdateInput = Prisma.VerificationCodeUncheckedUpdateInput;
+export interface UserCreateInput {
+  email: string;
+  name: string;
+  password: string;
+  phone: string;
+  provider?: string | null;
+  providerId?: string | null;
+  role?: Role;
+  surname: string;
+  verified: DateTimeString;
+}
+
+export type UserUpdateInput = Partial<UserCreateInput>;
+
+export interface CatCreateInput {
+  birthDate?: DateTimeString | null;
+  breed?: string | null;
+  name: string;
+  notes?: string | null;
+  ownerId: number;
+}
+
+export type CatUpdateInput = Partial<CatCreateInput>;
+
+export interface CatReportCreateInput {
+  catId: number;
+  date?: DateTimeString;
+  employeeId: number;
+  notes: string;
+}
+
+export type CatReportUpdateInput = Partial<CatReportCreateInput>;
+
+export interface ReportImageCreateInput {
+  reportId: number;
+  url: string;
+}
+
+export type ReportImageUpdateInput = Partial<ReportImageCreateInput>;
+
+export interface RoomCategoryCreateInput {
+  areaId: number;
+  depthCm: number;
+  description?: string | null;
+  heightCm: number;
+  name: string;
+  price: DecimalString;
+  widthCm: number;
+}
+
+export type RoomCategoryUpdateInput = Partial<RoomCategoryCreateInput>;
+
+export interface RoomCreateInput {
+  categoryId: number;
+  name: string;
+}
+
+export type RoomUpdateInput = Partial<RoomCreateInput>;
+
+export interface RoomAreaCreateInput {
+  value: number;
+}
+
+export type RoomAreaUpdateInput = Partial<RoomAreaCreateInput>;
+
+export interface FeatureCreateInput {
+  imageUrl: string;
+  name: string;
+  price: DecimalString;
+}
+
+export type FeatureUpdateInput = Partial<FeatureCreateInput>;
+
+export interface ServiceCreateInput {
+  description?: string | null;
+  name: string;
+  price: DecimalString;
+}
+
+export type ServiceUpdateInput = Partial<ServiceCreateInput>;
+
+export interface ReviewCreateInput {
+  bookingId?: number | null;
+  comment?: string | null;
+  rating: number;
+  userId: number;
+}
+
+export type ReviewUpdateInput = Partial<ReviewCreateInput>;
+
+export interface BookingItemCreateInput {
+  bookingId: number;
+  catId: number;
+  priceAtBooking: DecimalString;
+  roomId: number;
+}
+
+export type BookingItemUpdateInput = Partial<BookingItemCreateInput>;
+
+export interface BookingItemServiceCreateInput {
+  bookingItemId: number;
+  price: DecimalString;
+  quantity?: number;
+  serviceId: number;
+}
+
+export type BookingItemServiceUpdateInput = Partial<BookingItemServiceCreateInput>;
+
+export interface BookingCreateInput {
+  endDate: DateTimeString;
+  paymentId?: string | null;
+  startDate: DateTimeString;
+  status?: BookingStatus;
+  totalPrice: DecimalString;
+  userId: number;
+}
+
+export type BookingUpdateInput = Partial<BookingCreateInput>;
+
+export interface NewsCreateInput {
+  authorId: number;
+  content: string;
+  imageUrl?: string | null;
+  isPublished?: boolean;
+  title: string;
+}
+
+export type NewsUpdateInput = Partial<NewsCreateInput>;
+
+export interface VerificationCodeCreateInput {
+  code: string;
+  userId: number;
+}
+
+export type VerificationCodeUpdateInput = Partial<VerificationCodeCreateInput>;

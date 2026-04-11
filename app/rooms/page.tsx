@@ -13,9 +13,10 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 import { ContactSection } from '../_components/ContactSection';
-import { type FiltersConfig, FiltersPanel } from './_components/FiltersPanel';
+import { FiltersPanel } from './_components/FiltersPanel';
+import type { FiltersConfig } from './_components/filters.types';
 import { RoomCard } from './_components/RoomCard';
-import { AMENITIES, AREAS, ROOMS } from './_data/rooms';
+import { FEATURES, ROOMS } from './_data/rooms';
 import { type SortOption, useRoomFilters } from './_hooks/useRoomFilters';
 
 const SORT_LABELS: Record<SortOption, string> = {
@@ -26,8 +27,7 @@ const SORT_LABELS: Record<SortOption, string> = {
 };
 
 const FILTERS_CONFIG: FiltersConfig = {
-  areas: AREAS,
-  amenities: AMENITIES,
+  features: FEATURES,
 };
 
 // --- Головний UI компонент ---

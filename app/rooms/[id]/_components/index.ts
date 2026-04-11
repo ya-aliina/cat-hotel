@@ -1,4 +1,4 @@
-export { AmenityItem } from './AmenityItem';
+export { FeatureItem } from './FeatureItem';
 export { InfoItem } from './InfoItem';
 export { NotFoundState } from './NotFoundState';
 export { RelatedRooms } from './RelatedRooms';

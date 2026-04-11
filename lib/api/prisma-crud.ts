@@ -300,7 +300,10 @@ const resources: Record<string, ResourceConfig> = {
     itemKey: 'roomArea',
     listKey: 'roomAreas',
     list: () => {
-      return prisma.roomArea.findMany({ include: roomAreaInclude });
+      return prisma.roomArea.findMany({
+        orderBy: { value: 'asc' },
+        include: roomAreaInclude,
+      });
     },
     create: (data) => {
       return prisma.roomArea.create({

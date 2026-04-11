@@ -8,13 +8,13 @@ import { ContactSection } from '@/app/_components/ContactSection';
 import { BookingModal } from '@/components/shared/BookingModal';
 import { PawButton } from '@/components/ui/PawButton';
 
-import { AMENITIES, ROOMS } from '../_data/rooms';
+import { FEATURES, ROOMS } from '../_data/rooms';
 import { useRoomDetails } from './_ hooks/useRoomDetails';
-import { AmenityItem, InfoItem, NotFoundState, RelatedRooms, RoomGallery } from './_components';
+import { FeatureItem, InfoItem, NotFoundState, RelatedRooms, RoomGallery } from './_components';
 import { formatArea, formatRoomCode } from './_utils/roomUtils';
 
-const amenityLabelById = AMENITIES.reduce<Record<string, string>>((acc, amenity) => {
-  acc[amenity.id] = amenity.label;
+const featureLabelById = FEATURES.reduce<Record<string, string>>((acc, feature) => {
+  acc[feature.id] = feature.label;
 
   return acc;
 }, {});
@@ -71,7 +71,7 @@ export default function RoomDetailsPage() {
                   <p className="font-semibold mb-2">Оснащення номера:</p>
                   <ul className="grid grid-cols-1 sm:grid-cols-2 gap-y-1.5">
                     {room.equipment.map((id) => {
-                      return <AmenityItem key={id} id={id} label={amenityLabelById[id] || id} />;
+                      return <FeatureItem key={id} id={id} label={featureLabelById[id] || id} />;
                     })}
                   </ul>
                 </div>

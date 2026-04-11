@@ -87,6 +87,9 @@ model RoomCategory {
     name        String  @unique
     description String?
     price       Decimal
+    widthCm     Int
+    depthCm     Int
+    heightCm    Int
 
     rooms    Room[]
     features Feature[]

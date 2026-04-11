@@ -106,7 +106,7 @@ export const ROOMS: Room[] = [
   },
 ];
 
-export const AMENITIES = [
+export const FEATURES = [
   { label: 'Пустий номер', id: 'none' },
   { label: 'Лежак', id: 'bed' },
   { label: 'Кігтеточка', id: 'scratcher' },

@@ -2,16 +2,18 @@
 
 import { useCallback, useMemo, useState } from 'react';
 
-import { type FiltersState } from '../_components/FiltersPanel';
+import type { FiltersState } from '../_components/filters.types';
 import { ROOMS } from '../_data/rooms';
 
 export type SortOption = 'area-asc' | 'area-desc' | 'price-asc' | 'price-desc';
 
 const DEFAULT_FILTERS: FiltersState = {
+  featureIds: [],
   priceMin: '',
   priceMax: '',
+  areaIds: [],
   areas: [],
-  amenities: [],
+  features: [],
 };
 
 export function useRoomFilters() {
@@ -29,7 +31,7 @@ export function useRoomFilters() {
   }, []);
 
   const sortedAndFilteredRooms = useMemo(() => {
-    const filteredRooms = ROOMS.filter((room, index) => {
+    const filteredRooms = ROOMS.filter((room) => {
       const min = Number(appliedFilters.priceMin);
       const max = Number(appliedFilters.priceMax);
 
@@ -37,12 +39,13 @@ export function useRoomFilters() {
         return false;
       if (!Number.isNaN(max) && appliedFilters.priceMax.trim() !== '' && room.price > max)
         return false;
-      if (appliedFilters.areas.length > 0 && !appliedFilters.areas.includes(index)) return false;
+      if (appliedFilters.areas.length > 0 && !appliedFilters.areas.includes(String(room.area)))
+        return false;
 
-      if (appliedFilters.amenities.length > 0) {
+      if (appliedFilters.features.length > 0) {
         if (
-          !appliedFilters.amenities.every((amenityId) => {
-            return room.equipment.includes(amenityId);
+          !appliedFilters.features.every((featureId) => {
+            return room.equipment.includes(featureId);
           })
         ) {
           return false;

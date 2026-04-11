@@ -96,6 +96,9 @@ export const RoomCategories = [
     description:
       'Затишний базовий номер для спокійного відпочинку котика. Розміри (ШхГхВ): 90х70х180 см',
     price: 100,
+    widthCm: 90,
+    depthCm: 70,
+    heightCm: 180,
     areaId: 1,
   },
   {
@@ -104,6 +107,9 @@ export const RoomCategories = [
     description:
       "Більше простору та м'який лежак для комфортного сну. Розміри (ШхГхВ): 90х100х180 см",
     price: 200,
+    widthCm: 90,
+    depthCm: 100,
+    heightCm: 180,
     areaId: 2,
   },
   {
@@ -112,6 +118,9 @@ export const RoomCategories = [
     description:
       'Оптимальний номер з ігровою зоною для активних хвостиків. Розміри (ШхГхВ): 100х125х180 см',
     price: 250,
+    widthCm: 100,
+    depthCm: 125,
+    heightCm: 180,
     areaId: 3,
   },
   {
@@ -120,6 +129,9 @@ export const RoomCategories = [
     description:
       'Просторий номер з підвищеним комфортом для довгого проживання. Розміри (ШхГхВ): 125х125х180 см',
     price: 350,
+    widthCm: 125,
+    depthCm: 125,
+    heightCm: 180,
     areaId: 4,
   },
   {
@@ -128,6 +140,9 @@ export const RoomCategories = [
     description:
       'Преміальний номер з будиночком та ігровим комплексом. Розміри (ШхГхВ): 160х160х180 см',
     price: 500,
+    widthCm: 160,
+    depthCm: 160,
+    heightCm: 180,
     areaId: 5,
   },
   {
@@ -136,6 +151,9 @@ export const RoomCategories = [
     description:
       'Максимальний простір та топове оснащення для найвибагливіших гостей. Розміри (ШхГхВ): 180х160х180 см',
     price: 600,
+    widthCm: 180,
+    depthCm: 160,
+    heightCm: 180,
     areaId: 6,
   },
 ];

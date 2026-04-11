@@ -3,22 +3,23 @@
 import React from 'react';
 
 import { Api } from '@/services/api-clients';
-import type { RoomAreaDto } from '@/services/types';
+import type { FeatureDto } from '@/services/types';
 
 interface ReturnProps {
-  areas: RoomAreaDto[];
+  features: FeatureDto[];
   isLoading: boolean;
 }
 
-export const useFilterRoomArea = (): ReturnProps => {
-  const [areas, setAreas] = React.useState<RoomAreaDto[]>([]);
+export const useFilterFeatures = (): ReturnProps => {
+  const [features, setFeatures] = React.useState<FeatureDto[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
-    async function fetchRoomAreas() {
+    async function fetchFeatures() {
       try {
-        const roomAreas = await Api.roomAreas.getAll();
-        setAreas(roomAreas);
+        const fetchedFeatures = await Api.features.getAll();
+
+        setFeatures(fetchedFeatures);
       } catch (caughtError) {
         console.log(caughtError);
       } finally {
@@ -26,11 +27,11 @@ export const useFilterRoomArea = (): ReturnProps => {
       }
     }
 
-    fetchRoomAreas();
+    fetchFeatures();
   }, []);
 
   return {
-    areas,
+    features,
     isLoading,
   };
 };
