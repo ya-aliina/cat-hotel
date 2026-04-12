@@ -3,6 +3,7 @@ import './globals.css';
 import { Analytics } from '@vercel/analytics/next';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono, Inter } from 'next/font/google';
+import { Toaster } from 'sonner';
 
 import { AuthSessionProvider } from '@/components/providers/AuthSessionProvider';
 import Footer from '@/components/shared/Footer';
@@ -42,6 +43,7 @@ export default function RootLayout({
           <Header />
           <main className="bg-brand-surface-alt">{children}</main>
           <Footer />
+          <Toaster richColors position="top-right" />
         </AuthSessionProvider>
         <Analytics />
       </body>

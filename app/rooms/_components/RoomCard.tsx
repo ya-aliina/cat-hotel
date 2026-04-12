@@ -81,9 +81,6 @@ export function RoomCard({ imagePriority = false, room, onBook }: RoomCardProps)
           </div>
 
           <p className="text-lg font-bold mt-4">Ціна за добу: {room.price}₴</p>
-          <p className="text-sm text-brand-text-subtle mt-1">
-            Вільних номерів: {room.availableRooms}
-          </p>
         </div>
 
         <div

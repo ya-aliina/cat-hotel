@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import { AccountSidebar, type AccountSidebarSection } from './AccountSidebar';
 import { BookingHistorySection } from './BookingHistorySection';
 import { CurrentBookingsSection } from './CurrentBookingsSection';
-import { NotificationsSection } from './NotificationsSection';
+import { MyPetsSection } from './MyPetsSection';
 import { ProfileSection } from './ProfileSection';
 import { SecuritySection } from './SecuritySection';
 
@@ -39,9 +39,9 @@ export function AccountContentSwitcher() {
           />
         )}
         {activeSection === 'history' && <BookingHistorySection />}
+        {activeSection === 'pets' && <MyPetsSection />}
         {activeSection === 'profile' && <ProfileSection />}
         {activeSection === 'security' && !isOauthUser && <SecuritySection />}
-        {activeSection === 'notifications' && <NotificationsSection />}
       </div>
     </div>
   );

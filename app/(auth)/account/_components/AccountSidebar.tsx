@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react';
 export type AccountSidebarSection =
   | 'bookings'
   | 'history'
-  | 'notifications'
+  | 'pets'
   | 'profile'
   | 'security';
 
@@ -29,9 +29,9 @@ export function AccountSidebar({
   const navItems: Array<{ id: AccountSidebarSection; label: string }> = [
     { id: 'bookings', label: 'Поточні бронювання' },
     { id: 'history', label: 'Історія бронювань' },
+    { id: 'pets', label: 'Мої улюбленці' },
     { id: 'profile', label: 'Профіль' },
     ...(showSecurity ? [{ id: 'security' as const, label: 'Безпека' }] : []),
-    { id: 'notifications', label: 'Сповіщення' },
   ];
 
   return (

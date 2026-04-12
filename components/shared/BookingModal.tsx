@@ -330,40 +330,6 @@ export function BookingModal({
                   })}
                   className="space-y-5"
                 >
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <Input
-                      type="text"
-                      placeholder="Ім'я"
-                      {...register('name')}
-                      error={errors.name?.message}
-                      className="flex-1"
-                    />
-                    <Input
-                      type="text"
-                      placeholder="Прізвище"
-                      {...register('surname')}
-                      error={errors.surname?.message}
-                      className="flex-1"
-                    />
-                  </div>
-
-                  <Input
-                    type="tel"
-                    placeholder="Телефон"
-                    {...register('phone', {
-                      onChange: (e) => {
-                        e.target.value = e.target.value.replace(/\D/g, '');
-                      },
-                    })}
-                    error={errors.phone?.message}
-                  />
-
-                  <Input
-                    type="email"
-                    placeholder="E-mail"
-                    {...register('email')}
-                    error={errors.email?.message}
-                  />
 
                   <div className="flex flex-col sm:flex-row items-start gap-4">
                     <div className="flex-1 w-full">
