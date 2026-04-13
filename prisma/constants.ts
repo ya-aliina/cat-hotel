@@ -47,12 +47,12 @@ export const Users = [
 ];
 
 export const RoomAreas = [
-  { id: 1, value: 0.63 },
-  { id: 2, value: 0.9 },
-  { id: 3, value: 1.13 },
-  { id: 4, value: 1.56 },
-  { id: 5, value: 2.56 },
-  { id: 6, value: 2.88 },
+  { id: 1, value: 0.63, widthCm: 90, depthCm: 70, heightCm: 180 },
+  { id: 2, value: 0.9, widthCm: 90, depthCm: 100, heightCm: 180 },
+  { id: 3, value: 1.13, widthCm: 100, depthCm: 125, heightCm: 180 },
+  { id: 4, value: 1.56, widthCm: 125, depthCm: 125, heightCm: 180 },
+  { id: 5, value: 2.56, widthCm: 160, depthCm: 160, heightCm: 180 },
+  { id: 6, value: 2.88, widthCm: 180, depthCm: 160, heightCm: 180 },
 ];
 
 export const Features = [
@@ -96,9 +96,7 @@ export const RoomCategories = [
     name: 'Економ',
     description: 'Затишний базовий номер для спокійного відпочинку котика.',
     price: 100,
-    widthCm: 90,
-    depthCm: 70,
-    heightCm: 180,
+    roomCount: 4,
     areaId: 1,
   },
   {
@@ -106,9 +104,7 @@ export const RoomCategories = [
     name: 'Економ плюс',
     description: "Більше простору та м'який лежак для комфортного сну.",
     price: 200,
-    widthCm: 90,
-    depthCm: 100,
-    heightCm: 180,
+    roomCount: 3,
     areaId: 2,
   },
   {
@@ -116,9 +112,7 @@ export const RoomCategories = [
     name: 'Комфорт',
     description: 'Оптимальний номер з ігровою зоною для активних хвостиків.',
     price: 250,
-    widthCm: 100,
-    depthCm: 125,
-    heightCm: 180,
+    roomCount: 2,
     areaId: 3,
   },
   {
@@ -126,9 +120,7 @@ export const RoomCategories = [
     name: 'Сьют',
     description: 'Просторий номер з підвищеним комфортом для довгого проживання.',
     price: 350,
-    widthCm: 125,
-    depthCm: 125,
-    heightCm: 180,
+    roomCount: 2,
     areaId: 4,
   },
   {
@@ -136,9 +128,7 @@ export const RoomCategories = [
     name: 'Люкс',
     description: 'Преміальний номер з будиночком та ігровим комплексом.',
     price: 500,
-    widthCm: 160,
-    depthCm: 160,
-    heightCm: 180,
+    roomCount: 1,
     areaId: 5,
   },
   {
@@ -146,9 +136,7 @@ export const RoomCategories = [
     name: 'Супер-Люкс',
     description: 'Максимальний простір та топове оснащення для найвибагливіших гостей.',
     price: 600,
-    widthCm: 180,
-    depthCm: 160,
-    heightCm: 180,
+    roomCount: 1,
     areaId: 6,
   },
 ];

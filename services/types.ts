@@ -46,22 +46,23 @@ export interface ReportImageBase {
 
 export interface RoomAreaBase {
   createdAt: DateTimeString;
+  depthCm: number;
+  heightCm: number;
   id: number;
   updatedAt: DateTimeString;
   value: number;
+  widthCm: number;
 }
 
 export interface RoomCategoryBase {
   areaId: number;
   createdAt: DateTimeString;
-  depthCm: number;
   description: string | null;
-  heightCm: number;
   id: number;
   name: string;
   price: DecimalString;
+  roomCount: number;
   updatedAt: DateTimeString;
-  widthCm: number;
 }
 
 export interface RoomCategoryImageBase {
@@ -305,12 +306,10 @@ export type ReportImageUpdateInput = Partial<ReportImageCreateInput>;
 
 export interface RoomCategoryCreateInput {
   areaId: number;
-  depthCm: number;
   description?: string | null;
-  heightCm: number;
   name: string;
   price: DecimalString;
-  widthCm: number;
+  roomCount?: number;
 }
 
 export type RoomCategoryUpdateInput = Partial<RoomCategoryCreateInput>;
@@ -339,7 +338,10 @@ export interface RoomCreateInput {
 export type RoomUpdateInput = Partial<RoomCreateInput>;
 
 export interface RoomAreaCreateInput {
+  depthCm: number;
+  heightCm: number;
   value: number;
+  widthCm: number;
 }
 
 export type RoomAreaUpdateInput = Partial<RoomAreaCreateInput>;

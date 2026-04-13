@@ -34,3 +34,22 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Image Uploads (Admin Drag and Drop)
+
+Room image uploads in admin are implemented via Vercel Blob (`/api/admin/uploads`).
+
+### Required environment variable
+
+Set `BLOB_READ_WRITE_TOKEN`:
+
+- Local: add to `.env.local`
+- Production (Vercel): add in Project Settings -> Environment Variables
+
+Example:
+
+```bash
+BLOB_READ_WRITE_TOKEN=vercel_blob_rw_***
+```
+
+Without this token, upload requests return `500` with a storage token error.

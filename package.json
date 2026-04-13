@@ -2,6 +2,9 @@
   "name": "cat-hotel",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20 <23"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -20,6 +23,7 @@
     "@hookform/resolvers": "^5.2.2",
     "@prisma/client": "^6.19.3",
     "@vercel/analytics": "^2.0.1",
+    "@vercel/blob": "^2.3.3",
     "axios": "^1.15.0",
     "bcrypt": "^6.0.0",
     "class-variance-authority": "^0.7.1",

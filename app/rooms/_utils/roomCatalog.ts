@@ -80,14 +80,14 @@ function sanitizeRoomDescription(description: string | null | undefined) {
 }
 
 function resolveRoomSize(category: RoomCategoryDto) {
-  const dimensions = [category.widthCm, category.depthCm, category.heightCm];
+  const dimensions = [category.area.widthCm, category.area.depthCm, category.area.heightCm];
 
   if (
     dimensions.every((value) => {
       return typeof value === 'number' && Number.isFinite(value);
     })
   ) {
-    return `${category.widthCm}x${category.depthCm}x${category.heightCm}`;
+    return `${category.area.widthCm}x${category.area.depthCm}x${category.area.heightCm}`;
   }
 
   return '';
@@ -140,6 +140,6 @@ export function mapRoomCategoryToRoom(category: RoomCategoryDto): Room {
       };
     }),
     price: Number(category.price),
-    availableRooms: category.rooms.length,
+    availableRooms: category.roomCount || category.rooms.length,
   };
 }

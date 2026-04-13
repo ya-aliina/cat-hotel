@@ -10,8 +10,9 @@ import { PawLink } from '@/components/ui/PawLink';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { status } = useSession();
+  const { data: session, status } = useSession();
   const authed = status === 'authenticated';
+  const isAdmin = session?.user?.role === 'ADMIN';
 
   const aboutLinks = [
     { title: 'Чому ми', href: '/#why-us' },
@@ -21,12 +22,15 @@ const Header = () => {
   ];
 
   const navLinks = useMemo(() => {
+    const authLink = authed ? { title: 'Акаунт', href: '/account' } : { title: 'Вхід', href: '/login' };
+
     return [
       { title: 'Про нас', href: '/' },
       { title: 'Номери', href: '/rooms' },
-      authed ? { title: 'Акаунт', href: '/account' } : { title: 'Вхід', href: '/login' },
+      ...(isAdmin ? [{ title: 'Адмін', href: '/admin' }] : []),
+      authLink,
     ];
-  }, [authed]);
+  }, [authed, isAdmin]);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);

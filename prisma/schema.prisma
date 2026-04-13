@@ -92,9 +92,7 @@ model RoomCategory {
     name        String  @unique
     description String?
     price       Decimal
-    widthCm     Int
-    depthCm     Int
-    heightCm    Int
+    roomCount   Int     @default(1)
 
     rooms      Room[]
     features   Feature[]
@@ -146,8 +144,11 @@ model Room {
 }
 
 model RoomArea {
-    id    Int   @id @default(autoincrement())
-    value Float @unique
+    id       Int   @id @default(autoincrement())
+    value    Float @unique
+    widthCm  Int
+    depthCm  Int
+    heightCm Int
 
     categories RoomCategory[]
 
