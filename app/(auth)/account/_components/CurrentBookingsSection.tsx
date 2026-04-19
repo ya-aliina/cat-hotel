@@ -1,36 +1,25 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-
-type BookingStatus = 'active' | 'cancelled';
+import { BookingStatus } from '@prisma/client';
+import { useEffect, useMemo, useState } from 'react';
 
 type Booking = {
-  id: string;
-  roomTitle: string;
-  petName: string;
-  dateFrom: string;
-  dateTo: string;
+  endDate: string;
+  id: number;
+  petNames: string[];
+  roomTitles: string[];
+  startDate: string;
   status: BookingStatus;
 };
 
-const INITIAL_BOOKINGS: Booking[] = [
-  {
-    id: 'b-101',
-    roomTitle: 'Комфорт',
-    petName: 'Мурчик',
-    dateFrom: '2026-03-22',
-    dateTo: '2026-03-27',
-    status: 'active',
-  },
-  {
-    id: 'b-102',
-    roomTitle: 'Люкс',
-    petName: 'Сімба',
-    dateFrom: '2026-04-04',
-    dateTo: '2026-04-09',
-    status: 'active',
-  },
-];
+type BookingsResponse = {
+  activeBookings?: Booking[];
+  error?: string;
+};
+
+type CurrentBookingsSectionProps = {
+  onOpenHistory?: () => void;
+};
 
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString('uk-UA', {
@@ -40,22 +29,57 @@ function formatDate(date: string) {
   });
 }
 
-export function CurrentBookingsSection() {
-  const [bookings, setBookings] = useState<Booking[]>(INITIAL_BOOKINGS);
+export function CurrentBookingsSection({ onOpenHistory }: CurrentBookingsSectionProps) {
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadBookings = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await fetch('/api/account/bookings');
+      const responseData = (await response.json().catch(() => null)) as BookingsResponse | null;
+
+      if (!isMounted) {
+        return;
+      }
+
+      if (!response.ok) {
+        setIsLoading(false);
+        setError(responseData?.error ?? 'Не вдалося завантажити бронювання.');
+        return;
+      }
+
+      setBookings(responseData?.activeBookings ?? []);
+      setIsLoading(false);
+    };
+
+    void loadBookings();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const hasActiveBookings = useMemo(() => {
-    return bookings.some((booking) => {
-      return booking.status === 'active';
-    });
+    return bookings.length > 0;
   }, [bookings]);
 
-  const handleCancel = (id: string) => {
-    setBookings((prev) => {
-      return prev.map((booking) => {
-        if (booking.id !== id) return booking;
-        return { ...booking, status: 'cancelled' };
-      });
-    });
+  const getStatusLabel = (status: BookingStatus) => {
+    switch (status) {
+      case BookingStatus.SUCCEEDED:
+        return 'Підтверджене';
+      case BookingStatus.PENDING:
+        return 'Очікує підтвердження';
+      case BookingStatus.CANCELLED:
+        return 'Скасоване';
+      default:
+        return status;
+    }
   };
 
   return (
@@ -65,8 +89,31 @@ export function CurrentBookingsSection() {
     >
       <h2 className="text-2xl font-bold text-brand-text">Поточні бронювання</h2>
 
-      {!hasActiveBookings ? (
-        <p className="mt-6 text-[16px] text-brand-text-subtle">У вас немає активних бронювань.</p>
+      {isLoading ? (
+        <p className="mt-6 text-[16px] text-brand-text-subtle">Завантажуємо ваші бронювання...</p>
+      ) : error ? (
+        <p className="mt-6 text-[16px] text-destructive">{error}</p>
+      ) : !hasActiveBookings ? (
+        <div className="mt-6 space-y-2">
+          <p className="text-[16px] text-brand-text-subtle">У вас поки немає активних бронювань.</p>
+          <p className="text-[15px] text-brand-text-subtle">
+            Перегляньте{' '}
+            {onOpenHistory ? (
+              <button
+                type="button"
+                onClick={onOpenHistory}
+                className="font-medium text-brand-orange hover:text-brand-text"
+              >
+                історію бронювань
+              </button>
+            ) : (
+              <a href="#bookings-history" className="font-medium text-brand-orange hover:text-brand-text">
+                історію бронювань
+              </a>
+            )}
+            .
+          </p>
+        </div>
       ) : (
         <div className="mt-6 space-y-4">
           {bookings.map((booking) => {
@@ -77,47 +124,31 @@ export function CurrentBookingsSection() {
               >
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <h3 className="text-xl font-bold text-brand-text">{booking.roomTitle}</h3>
+                    <h3 className="text-xl font-bold text-brand-text">
+                      {booking.roomTitles.join(', ') || 'Номер'}
+                    </h3>
                     <p className="mt-1 text-[15px] text-brand-text-subtle">
-                      Улюбленець: {booking.petName}
+                      Улюбленці: {booking.petNames.join(', ') || 'Не вказано'}
                     </p>
                   </div>
 
                   <span
-                    className={
-                      booking.status === 'active'
-                        ? 'inline-flex w-fit rounded-full bg-brand-yellow/30 px-3 py-1 text-[13px] font-semibold text-brand-text'
-                        : 'inline-flex w-fit rounded-full bg-gray-100 px-3 py-1 text-[13px] font-semibold text-brand-text-subtle'
-                    }
+                    className="inline-flex w-fit rounded-full bg-brand-yellow/30 px-3 py-1 text-[13px] font-semibold text-brand-text"
                   >
-                    {booking.status === 'active' ? 'Активне' : 'Скасовано'}
+                    {getStatusLabel(booking.status)}
                   </span>
                 </div>
 
                 <div className="mt-4 grid grid-cols-1 gap-3 text-[15px] text-brand-text sm:grid-cols-2">
                   <p>
                     <span className="text-brand-text-subtle">Заїзд:</span>{' '}
-                    {formatDate(booking.dateFrom)}
+                    {formatDate(booking.startDate)}
                   </p>
                   <p>
                     <span className="text-brand-text-subtle">Виїзд:</span>{' '}
-                    {formatDate(booking.dateTo)}
+                    {formatDate(booking.endDate)}
                   </p>
                 </div>
-
-                {booking.status === 'active' && (
-                  <div className="mt-5">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        handleCancel(booking.id);
-                      }}
-                      className="cursor-pointer rounded-full border border-brand-orange px-5 py-2.5 text-[15px] font-semibold text-brand-orange transition-colors hover:bg-brand-orange hover:text-white"
-                    >
-                      Скасувати бронь
-                    </button>
-                  </div>
-                )}
               </article>
             );
           })}

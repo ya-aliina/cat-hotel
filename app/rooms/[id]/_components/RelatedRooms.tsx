@@ -4,10 +4,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { memo } from 'react';
 
-import { ROOMS } from '../../_data/rooms';
+import type { Room } from '../../_types/room';
 
 interface RelatedRoomsProps {
-  rooms: typeof ROOMS;
+  rooms: Room[];
 }
 
 export const RelatedRooms = memo(function RelatedRooms({ rooms }: RelatedRoomsProps) {
@@ -29,6 +29,7 @@ export const RelatedRooms = memo(function RelatedRooms({ rooms }: RelatedRoomsPr
                     alt={r.title}
                     fill
                     className="object-cover group-hover:scale-[1.02] transition-transform duration-300"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                   />
                 </div>
                 <div className="p-5">

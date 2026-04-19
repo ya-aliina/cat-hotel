@@ -3,7 +3,9 @@ import './globals.css';
 import { Analytics } from '@vercel/analytics/next';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono, Inter } from 'next/font/google';
+import { Toaster } from 'sonner';
 
+import { AuthSessionProvider } from '@/components/providers/AuthSessionProvider';
 import Footer from '@/components/shared/Footer';
 import Header from '@/components/shared/Header';
 import { cn } from '@/lib/utils';
@@ -37,9 +39,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased pt-20`}
         suppressHydrationWarning
       >
-        <Header />
-        <main className="bg-brand-surface-alt">{children}</main>
-        <Footer />
+        <AuthSessionProvider>
+          <Header />
+          <main className="bg-brand-surface-alt">{children}</main>
+          <Footer />
+          <Toaster richColors position="top-right" />
+        </AuthSessionProvider>
         <Analytics />
       </body>
     </html>

@@ -1,0 +1,36 @@
+ALTER TABLE "RoomCategory"
+ADD COLUMN "widthCm" INTEGER,
+ADD COLUMN "depthCm" INTEGER,
+ADD COLUMN "heightCm" INTEGER;
+
+UPDATE "RoomCategory"
+SET
+  "widthCm" = CASE "id"
+    WHEN 1 THEN 90
+    WHEN 2 THEN 90
+    WHEN 3 THEN 100
+    WHEN 4 THEN 125
+    WHEN 5 THEN 160
+    WHEN 6 THEN 180
+  END,
+  "depthCm" = CASE "id"
+    WHEN 1 THEN 70
+    WHEN 2 THEN 100
+    WHEN 3 THEN 125
+    WHEN 4 THEN 125
+    WHEN 5 THEN 160
+    WHEN 6 THEN 160
+  END,
+  "heightCm" = CASE "id"
+    WHEN 1 THEN 180
+    WHEN 2 THEN 180
+    WHEN 3 THEN 180
+    WHEN 4 THEN 180
+    WHEN 5 THEN 180
+    WHEN 6 THEN 180
+  END;
+
+ALTER TABLE "RoomCategory"
+ALTER COLUMN "widthCm" SET NOT NULL,
+ALTER COLUMN "depthCm" SET NOT NULL,
+ALTER COLUMN "heightCm" SET NOT NULL;

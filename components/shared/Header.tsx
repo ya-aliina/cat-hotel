@@ -3,14 +3,16 @@
 import { Menu, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useMemo, useState } from 'react';
 
 import { PawLink } from '@/components/ui/PawLink';
-import { isAuthenticated, onAuthChange } from '@/lib/auth';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [authed, setAuthed] = useState(false);
+  const { data: session, status } = useSession();
+  const authed = status === 'authenticated';
+  const isAdmin = session?.user?.role === 'ADMIN';
 
   const aboutLinks = [
     { title: 'Чому ми', href: '/#why-us' },
@@ -20,25 +22,15 @@ const Header = () => {
   ];
 
   const navLinks = useMemo(() => {
+    const authLink = authed ? { title: 'Акаунт', href: '/account' } : { title: 'Вхід', href: '/login' };
+
     return [
       { title: 'Про нас', href: '/' },
       { title: 'Номери', href: '/rooms' },
-      authed ? { title: 'Акаунт', href: '/account' } : { title: 'Вхід', href: '/login' },
+      ...(isAdmin ? [{ title: 'Адмін', href: '/admin' }] : []),
+      authLink,
     ];
-  }, [authed]);
-
-  useEffect(() => {
-    const sync = () => {
-      setAuthed(isAuthenticated());
-    };
-
-    sync();
-    const unsubscribe = onAuthChange(sync);
-
-    return () => {
-      unsubscribe();
-    };
-  }, []);
+  }, [authed, isAdmin]);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -57,6 +49,8 @@ const Header = () => {
                 width={48}
                 height={40}
                 className="w-full h-full object-contain"
+                loading="eager"
+                fetchPriority="high"
               />
             </Link>
           </div>

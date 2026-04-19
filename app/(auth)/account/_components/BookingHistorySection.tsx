@@ -1,0 +1,136 @@
+'use client';
+
+import { BookingStatus } from '@prisma/client';
+import { useEffect, useMemo, useState } from 'react';
+
+type Booking = {
+  endDate: string;
+  id: number;
+  petNames: string[];
+  roomTitles: string[];
+  startDate: string;
+  status: BookingStatus;
+};
+
+type BookingsResponse = {
+  error?: string;
+  historyBookings?: Booking[];
+};
+
+function formatDate(date: string) {
+  return new Date(date).toLocaleDateString('uk-UA', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+}
+
+function getStatusLabel(status: BookingStatus) {
+  switch (status) {
+    case BookingStatus.SUCCEEDED:
+      return 'Завершене';
+    case BookingStatus.PENDING:
+      return 'Не завершене';
+    case BookingStatus.CANCELLED:
+      return 'Скасоване';
+    default:
+      return status;
+  }
+}
+
+export function BookingHistorySection() {
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadHistoryBookings = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await fetch('/api/account/bookings');
+      const responseData = (await response.json().catch(() => null)) as BookingsResponse | null;
+
+      if (!isMounted) {
+        return;
+      }
+
+      if (!response.ok) {
+        setIsLoading(false);
+        setError(responseData?.error ?? 'Не вдалося завантажити історію бронювань.');
+        return;
+      }
+
+      setBookings(responseData?.historyBookings ?? []);
+      setIsLoading(false);
+    };
+
+    void loadHistoryBookings();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const hasHistoryBookings = useMemo(() => {
+    return bookings.length > 0;
+  }, [bookings]);
+
+  return (
+    <section
+      id="bookings-history"
+      className="bg-white rounded-[30px] border border-gray-100 shadow-sm p-6 md:p-8"
+    >
+      <h2 className="text-2xl font-bold text-brand-text">Історія бронювань</h2>
+
+      {isLoading ? (
+        <p className="mt-6 text-[16px] text-brand-text-subtle">Завантажуємо історію бронювань...</p>
+      ) : error ? (
+        <p className="mt-6 text-[16px] text-destructive">{error}</p>
+      ) : !hasHistoryBookings ? (
+        <p className="mt-6 text-[16px] text-brand-text-subtle">
+          Історія бронювань поки порожня.
+        </p>
+      ) : (
+        <div className="mt-6 space-y-4">
+          {bookings.map((booking) => {
+            return (
+              <article
+                key={booking.id}
+                className="rounded-2xl border border-gray-100 bg-brand-surface-card p-5 md:p-6"
+              >
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <h3 className="text-xl font-bold text-brand-text">
+                      {booking.roomTitles.join(', ') || 'Номер'}
+                    </h3>
+                    <p className="mt-1 text-[15px] text-brand-text-subtle">
+                      Улюбленці: {booking.petNames.join(', ') || 'Не вказано'}
+                    </p>
+                  </div>
+
+                  <span className="inline-flex w-fit rounded-full bg-gray-100 px-3 py-1 text-[13px] font-semibold text-brand-text-subtle">
+                    {getStatusLabel(booking.status)}
+                  </span>
+                </div>
+
+                <div className="mt-4 grid grid-cols-1 gap-3 text-[15px] text-brand-text sm:grid-cols-2">
+                  <p>
+                    <span className="text-brand-text-subtle">Заїзд:</span>{' '}
+                    {formatDate(booking.startDate)}
+                  </p>
+                  <p>
+                    <span className="text-brand-text-subtle">Виїзд:</span>{' '}
+                    {formatDate(booking.endDate)}
+                  </p>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
+}

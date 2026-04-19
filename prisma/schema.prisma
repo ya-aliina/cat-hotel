@@ -1,0 +1,293 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("CATHOTEL_PRISMA_DATABASE_URL")
+}
+
+enum Role {
+    USER // Звичайний клієнт (власник котика)
+    EMPLOYEE // Співробітник (може писати звіти про здоров'я)
+    ADMIN // Власник готелю (повний доступ)
+}
+
+enum BookingStatus {
+    PENDING
+    SUCCEEDED
+    CANCELLED
+}
+
+enum VerificationCodePurpose {
+    EMAIL_VERIFICATION
+    PASSWORD_RESET
+}
+
+model User {
+    id       Int    @id @default(autoincrement())
+    name     String
+    surname  String
+    email    String @unique
+    phone    String?
+    password String
+
+    role     Role      @default(USER)
+    verified DateTime?
+
+    provider   String? // Для OAuth (наприклад, "google", "facebook")
+    providerId String? // ID користувача в провайдері OAuth
+
+    cats     Cat[]
+    bookings Booking[]
+    reviews  Review[]
+    reports  CatReport[] @relation("EmployeeReports")
+    news     News[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    verificationCodes VerificationCode[]
+}
+
+model Cat {
+    id        Int       @id @default(autoincrement())
+    name      String
+    breed     String?
+    birthDate DateTime?
+    notes     String?
+
+    owner   User @relation(fields: [ownerId], references: [id])
+    ownerId Int
+
+    reports CatReport[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    bookingItems BookingItem[]
+}
+
+model CatReport {
+    id     Int           @id @default(autoincrement())
+    date   DateTime      @default(now())
+    notes  String
+    images ReportImage[]
+
+    cat        Cat  @relation(fields: [catId], references: [id], onDelete: Cascade)
+    catId      Int
+    employeeId Int
+    employee   User @relation("EmployeeReports", fields: [employeeId], references: [id])
+}
+
+model ReportImage {
+    id       Int       @id @default(autoincrement())
+    url      String
+    reportId Int
+    report   CatReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+}
+
+model RoomCategory {
+    id          Int     @id @default(autoincrement())
+    name        String  @unique
+    description String?
+    price       Decimal
+    roomCount   Int     @default(1)
+
+    rooms      Room[]
+    features   Feature[]
+    images     RoomCategoryImage[]
+    perfectFor PerfectForItem[]
+    area       RoomArea         @relation(fields: [areaId], references: [id])
+    areaId     Int
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model RoomCategoryImage {
+    id             Int          @id @default(autoincrement())
+    isCover        Boolean      @default(false)
+    url            String
+    sortOrder      Int          @default(0)
+    roomCategory   RoomCategory @relation(fields: [roomCategoryId], references: [id], onDelete: Cascade)
+    roomCategoryId Int
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([roomCategoryId, sortOrder])
+}
+
+model PerfectForItem {
+    id          Int    @id @default(autoincrement())
+    description String @unique
+    imageUrl    String
+
+    roomCategories RoomCategory[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Room {
+    id   Int    @id @default(autoincrement())
+    name String
+
+    category   RoomCategory @relation(fields: [categoryId], references: [id])
+    categoryId Int
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    bookingItems BookingItem[]
+}
+
+model RoomArea {
+    id       Int   @id @default(autoincrement())
+    value    Float @unique
+    widthCm  Int
+    depthCm  Int
+    heightCm Int
+
+    categories RoomCategory[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Feature {
+    id Int @id @default(autoincrement())
+
+    name           String         @unique
+    price          Decimal
+    imageUrl       String
+    roomCategories RoomCategory[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Service {
+    id          Int     @id @default(autoincrement())
+    name        String  @unique
+    price       Decimal
+    description String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    bookingItemServices BookingItemService[]
+}
+
+model Review {
+    id      Int     @id @default(autoincrement())
+    rating  Int
+    comment String?
+
+    user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId Int
+
+    booking   Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+    bookingId Int?     @unique
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model BookingItem {
+    id Int @id @default(autoincrement())
+
+    // Привязка к общему заказу
+    booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+    bookingId Int
+
+    // Конкретный номер
+    room   Room @relation(fields: [roomId], references: [id])
+    roomId Int
+
+    // Конкретный котик
+    cat   Cat @relation(fields: [catId], references: [id])
+    catId Int
+
+    // Дополнительные услуги именно для этого котика в этом номере
+    services BookingItemService[]
+
+    // Цена за этот конкретный "лот" на момент покупки
+    priceAtBooking Decimal
+}
+
+model BookingItemService {
+    id Int @id @default(autoincrement())
+
+    bookingItem   BookingItem @relation(fields: [bookingItemId], references: [id], onDelete: Cascade)
+    bookingItemId Int
+
+    service   Service @relation(fields: [serviceId], references: [id])
+    serviceId Int
+
+    quantity Int     @default(1)
+    price    Decimal // Ціна на момент бронювання, щоб зберегти історію навіть якщо ціна сервісу зміниться
+}
+
+model Booking {
+    id        Int      @id @default(autoincrement())
+    startDate DateTime
+    endDate   DateTime
+
+    totalPrice Decimal // Общая сумма всего заказа (всех комнат и услуг)
+
+    status BookingStatus @default(PENDING)
+
+    // Связь с пользователем (один кошелек, который платит)
+    user   User @relation(fields: [userId], references: [id])
+    userId Int
+
+    // Список забронированных позиций (твоя "корзина")
+    bookingItems BookingItem[]
+
+    // Связь с отзывом (один отзыв на всё бронирование)
+    review   Review?
+
+    paymentId String? @unique
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([userId])
+    @@index([startDate, endDate])
+}
+
+model News {
+    id       Int     @id @default(autoincrement())
+    title    String
+    content  String
+    imageUrl String?
+
+    isPublished Boolean @default(false)
+    author      User    @relation(fields: [authorId], references: [id])
+    authorId    Int
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model VerificationCode {
+    id        Int                     @id @default(autoincrement())
+    code      String                  @unique
+    purpose   VerificationCodePurpose
+    expiresAt DateTime
+    consumedAt DateTime?
+
+    user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId Int
+
+    createdAt DateTime @default(now())
+
+    @@index([userId, purpose])
+    @@unique([code, userId])
+}

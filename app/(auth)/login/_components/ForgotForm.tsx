@@ -1,32 +1,66 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 import { Input } from '@/components/ui/Input';
 import { PawButton } from '@/components/ui/PawButton';
+import { type EmailRequestData, emailRequestSchema } from '@/lib/auth-schemas';
 
 import type { AuthFormProps } from '../_types/types';
 
-const forgotSchema = z.object({
-  email: z.string().min(1, 'Обовʼязкове поле.').email('Некоректний формат email.'),
-});
-
-type ForgotData = z.infer<typeof forgotSchema>;
-
 export const ForgotForm = ({ onSwitch }: AuthFormProps) => {
+  const [cooldownSeconds, setCooldownSeconds] = useState<number | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ForgotData>({
-    resolver: zodResolver(forgotSchema),
+  } = useForm<EmailRequestData>({
+    resolver: zodResolver(emailRequestSchema),
   });
 
-  const onSubmit = (data: ForgotData) => {
-    console.log('Запит на відновлення пароля для:', data);
-    // TODO: Запит до API для скидання пароля
+  const onSubmit = async (data: EmailRequestData) => {
+    setFormError(null);
+    setCooldownSeconds(null);
+    setPreviewUrl(null);
+    setSuccessMessage(null);
+    setIsSubmitting(true);
+
+    const response = await fetch('/api/auth/forgot-password', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    const responseData = (await response.json().catch(() => {
+      return null;
+    })) as {
+      error?: string;
+      message?: string;
+      previewUrl?: string;
+      retryAfterSeconds?: number;
+    } | null;
+
+    setIsSubmitting(false);
+
+    if (!response.ok) {
+      setCooldownSeconds(responseData?.retryAfterSeconds ?? null);
+      setFormError(responseData?.error ?? 'Не вдалося надіслати інструкцію.');
+      return;
+    }
+
+    setPreviewUrl(responseData?.previewUrl ?? null);
+    setSuccessMessage(
+      responseData?.message ?? 'Якщо акаунт існує, ми надіслали інструкцію для відновлення.',
+    );
   };
 
   return (
@@ -41,10 +75,30 @@ export const ForgotForm = ({ onSwitch }: AuthFormProps) => {
           {...register('email')}
           error={errors.email?.message}
         />
+        {formError && <p className="px-4 text-sm text-destructive">{formError}</p>}
+        {successMessage && <p className="px-4 text-sm text-brand-success">{successMessage}</p>}
+        {previewUrl && (
+          <a
+            href={previewUrl}
+            className="block px-4 text-sm font-medium text-brand-orange transition-colors hover:text-brand-text"
+          >
+            Відкрити посилання для зміни пароля
+          </a>
+        )}
+        {cooldownSeconds && (
+          <p className="px-4 text-sm text-gray-400">
+            Новий запит можна зробити приблизно через {cooldownSeconds} сек.
+          </p>
+        )}
       </div>
       <div className="pt-8 flex flex-col items-center gap-4">
-        <PawButton type="submit" variant="accent" className="min-w-48 bg-brand-orange text-white">
-          Надіслати
+        <PawButton
+          type="submit"
+          variant="accent"
+          className="min-w-48 bg-brand-orange text-white"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Надсилаємо...' : 'Надіслати'}
         </PawButton>
         <button
           type="button"

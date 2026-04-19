@@ -2,24 +2,39 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
+import { getProviders, signIn } from 'next-auth/react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 import { Input } from '@/components/ui/Input';
 import { PawButton } from '@/components/ui/PawButton';
-import { signIn } from '@/lib/auth';
+import { type LoginData, loginSchema } from '@/lib/auth-schemas';
 
 import type { AuthFormProps } from '../_types/types';
 
-const loginSchema = z.object({
-  email: z.string().min(1, 'Обовʼязкове поле.').email('Некоректний формат email.'),
-  password: z.string().min(6, 'Пароль має містити мінімум 6 символів.'),
-});
+const OAUTH_ERROR_MESSAGES: Record<string, string> = {
+  AccessDenied: 'Google вхід було скасовано або заблоковано.',
+  Callback: 'Не вдалося завершити вхід через Google.',
+  OAuthAccountNotLinked: 'Цей email уже використовується іншим способом входу.',
+  OAuthCallback: 'Помилка під час повернення від Google. Спробуйте ще раз.',
+  OAuthCreateAccount: 'Не вдалося створити акаунт через Google.',
+  OAuthSignin: 'Не вдалося розпочати вхід через Google.',
+};
 
-type LoginData = z.infer<typeof loginSchema>;
-
-export const LoginForm = ({ onSwitch }: AuthFormProps) => {
+export const LoginForm = ({ onSwitch, oauthError }: AuthFormProps) => {
   const router = useRouter();
+  const [formError, setFormError] = useState<string | null>(
+    oauthError ? (OAUTH_ERROR_MESSAGES[oauthError] ?? `Помилка авторизації: ${oauthError}`) : null,
+  );
+  const [hasGoogleProvider, setHasGoogleProvider] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [needsVerification, setNeedsVerification] = useState(false);
+
+  useEffect(() => {
+    void getProviders().then((providers) => {
+      setHasGoogleProvider(Boolean(providers?.google));
+    });
+  }, []);
 
   const {
     register,
@@ -29,10 +44,61 @@ export const LoginForm = ({ onSwitch }: AuthFormProps) => {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = () => {
-    signIn();
-    router.push('/');
+  const onSubmit = async (data: LoginData) => {
+    setFormError(null);
+    setNeedsVerification(false);
+    setIsSubmitting(true);
+
+    const statusResponse = await fetch('/api/auth/login-status', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    const statusData = (await statusResponse.json().catch(() => {
+      return null;
+    })) as { error?: string; status?: 'invalid' | 'ok' | 'unverified' } | null;
+
+    if (!statusResponse.ok || statusData?.status === 'invalid') {
+      setIsSubmitting(false);
+      setFormError(statusData?.error ?? 'Невірний email або пароль.');
+      return;
+    }
+
+    if (statusData?.status === 'unverified') {
+      setIsSubmitting(false);
+      setFormError('Підтвердіть email перед входом до кабінету.');
+      setNeedsVerification(true);
+      return;
+    }
+
+    const result = await signIn('credentials', {
+      callbackUrl: '/account',
+      email: data.email,
+      password: data.password,
+      redirect: false,
+    });
+
+    setIsSubmitting(false);
+
+    if (!result || result.error) {
+      setFormError('Невірний email або пароль.');
+      return;
+    }
+
+    router.push(result.url ?? '/account');
+    router.refresh();
   };
+
+  useEffect(() => {
+    if (!oauthError) {
+      return;
+    }
+
+    setFormError(OAUTH_ERROR_MESSAGES[oauthError] ?? `Помилка авторизації: ${oauthError}`);
+  }, [oauthError]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -49,6 +115,18 @@ export const LoginForm = ({ onSwitch }: AuthFormProps) => {
           {...register('password')}
           error={errors.password?.message}
         />
+        {formError && <p className="px-4 text-sm text-destructive">{formError}</p>}
+        {needsVerification && (
+          <button
+            type="button"
+            onClick={() => {
+              return onSwitch('verify');
+            }}
+            className="px-4 text-left text-sm font-medium text-brand-orange transition-colors hover:text-brand-text"
+          >
+            Надіслати лист підтвердження ще раз
+          </button>
+        )}
       </div>
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 px-4 text-[16px]">
         <button
@@ -71,10 +149,28 @@ export const LoginForm = ({ onSwitch }: AuthFormProps) => {
         </button>
       </div>
       <div className="pt-8 flex justify-center">
-        <PawButton type="submit" variant="accent" className="min-w-48 text-white">
-          Увійти
+        <PawButton
+          type="submit"
+          variant="accent"
+          className="min-w-48 text-white"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Входимо...' : 'Увійти'}
         </PawButton>
       </div>
+      {hasGoogleProvider && (
+        <div className="pt-4 flex justify-center">
+          <PawButton
+            type="button"
+            className="min-w-64 border border-gray-200 bg-white text-brand-text"
+            onClick={() => {
+              void signIn('google', { callbackUrl: '/account' });
+            }}
+          >
+            Увійти через Google
+          </PawButton>
+        </div>
+      )}
     </form>
   );
 };

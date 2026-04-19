@@ -30,6 +30,6 @@
     ".next/dev/types/**/*.ts",
     "**/*.d.ts",
     "**/*.mts"
-  ],
+, "prisma/schema.prisma"  ],
   "exclude": ["node_modules"]
 }

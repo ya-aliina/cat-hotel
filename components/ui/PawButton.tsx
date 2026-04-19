@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
 import { cn } from '@/lib/utils';
 
@@ -25,20 +25,20 @@ const variants: Record<'default' | 'accent', ButtonStyle> = {
 
 type PawVariant = keyof typeof variants;
 
-interface PawButtonProps {
+interface PawButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
   children: ReactNode;
   variant?: PawVariant;
-  onClick?: () => void;
-  type?: 'button' | 'submit' | 'reset';
 }
 
 export const PawButton = ({
   className,
   children,
   onClick,
+  disabled,
   variant = 'default',
   type = 'button',
+  ...props
 }: PawButtonProps) => {
   const style = variants[variant];
 
@@ -46,11 +46,13 @@ export const PawButton = ({
     <button
       type={type}
       onClick={onClick}
+      disabled={disabled}
       className={cn(
-        'flex items-center justify-between gap-4 rounded-full p-2 pl-6 font-medium shadow cursor-pointer transition-transform duration-300 ease-out hover:scale-[1.03] active:scale-95',
+        'flex items-center justify-between gap-4 rounded-full p-2 pl-6 font-medium shadow cursor-pointer transition-transform duration-300 ease-out hover:scale-[1.03] active:scale-95 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100 disabled:active:scale-100',
         style.button,
         className,
       )}
+      {...props}
     >
       <span className="text-[16px] whitespace-nowrap">{children}</span>
 

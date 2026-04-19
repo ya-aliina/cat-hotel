@@ -1,35 +1,20 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { type ReactNode, useEffect, useState } from 'react';
-
-import { isAuthenticated, onAuthChange } from '@/lib/auth';
+import { useSession } from 'next-auth/react';
+import { type ReactNode, useEffect } from 'react';
 
 export function AccountGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const [isAllowed, setIsAllowed] = useState(false);
+  const { status } = useSession();
 
   useEffect(() => {
-    const sync = () => {
-      const authed = isAuthenticated();
+    if (status === 'unauthenticated') {
+      router.replace('/login');
+    }
+  }, [router, status]);
 
-      if (!authed) {
-        router.replace('/login');
-        return;
-      }
-
-      setIsAllowed(true);
-    };
-
-    sync();
-    const unsubscribe = onAuthChange(sync);
-
-    return () => {
-      unsubscribe();
-    };
-  }, [router]);
-
-  if (!isAllowed) return null;
+  if (status !== 'authenticated') return null;
 
   return <>{children}</>;
 }

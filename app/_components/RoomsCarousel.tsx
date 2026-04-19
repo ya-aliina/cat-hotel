@@ -1,9 +1,12 @@
 'use client';
 
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
-import { BookingModal } from '@/components/shared/BookingModal';
+import { BookingModal } from '@/components/shared/BookingPaymentModal';
+import type { BookingCartSubmission } from '@/components/shared/BookingPaymentModal';
 import {
   Carousel,
   type CarouselApi,
@@ -14,8 +17,19 @@ import {
 } from '@/components/ui/carousel';
 import { PawButton } from '@/components/ui/PawButton';
 import { cn } from '@/lib/utils';
+import { Api } from '@/services/api-clients';
 
-import { CAROUSEL_ROOMS, type CarouselRoom } from '../_data/carousel-rooms';
+import { useRoomCatalog } from '../rooms/_hooks/useRoomCatalog';
+import type { Room } from '../rooms/_types/room';
+
+type CarouselRoom = {
+  description: string;
+  features: string[];
+  id: string;
+  image: string;
+  slug: string;
+  title: string;
+};
 
 const RoomCard = React.memo(
   ({
@@ -25,19 +39,42 @@ const RoomCard = React.memo(
   }: {
     room: CarouselRoom;
     isPriority: boolean;
-    onBook: () => void;
+    onBook: (room: CarouselRoom) => void;
   }) => {
+    const router = useRouter();
+
+    const handleNavigateToDetails = () => {
+      router.push(`/rooms/${room.slug}`);
+    };
+
     return (
-      <div className="flex flex-col md:flex-row items-center justify-center">
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={handleNavigateToDetails}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            handleNavigateToDetails();
+          }
+        }}
+        className="flex flex-col md:flex-row items-center justify-center cursor-pointer"
+      >
         <div className="relative w-full max-w-150 h-75 md:h-101 rounded-[10px] overflow-hidden shadow-sm z-0 shrink-0">
-          <Image
-            src={room.image}
-            alt={`Фото номеру ${room.title}`}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 600px"
-            priority={isPriority}
-          />
+          {room.image ? (
+            <Image
+              src={room.image}
+              alt={`Фото номеру ${room.title}`}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 600px"
+              priority={isPriority}
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center bg-brand-surface text-sm text-brand-text-soft">
+              Фото відсутнє
+            </div>
+          )}
         </div>
 
         <div className="relative z-10 bg-white p-6 md:p-10 rounded-[8px] border border-gray-50 -mt-15 md:mt-0 md:-ml-25 w-[95%] md:w-125 md:h-71 flex flex-col justify-center">
@@ -56,14 +93,25 @@ const RoomCard = React.memo(
               })}
             </ul>
 
-            <PawButton
-              type="button"
-              variant="accent"
-              className="bg-brand-orange text-white py-2 shadow-lg"
-              onClick={onBook}
+            <div
+              onClick={(event) => {
+                event.stopPropagation();
+              }}
+              onKeyDown={(event) => {
+                event.stopPropagation();
+              }}
             >
-              Забронювати
-            </PawButton>
+              <PawButton
+                type="button"
+                variant="accent"
+                className="bg-brand-orange text-white py-2 shadow-lg"
+                onClick={() => {
+                  onBook(room);
+                }}
+              >
+                Забронювати
+              </PawButton>
+            </div>
           </div>
         </div>
       </div>
@@ -108,24 +156,82 @@ const Dots = React.memo(
 Dots.displayName = 'Dots';
 
 export function RoomsCarousel() {
+  const { rooms, bookingRooms } = useRoomCatalog();
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
 
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [initialRoomId, setInitialRoomId] = useState<string>();
 
-  const openBookingModal = useCallback(() => {
-    setBookingSuccess(false);
-    setIsBookingOpen(true);
-  }, []);
+  const carouselRooms = useMemo<CarouselRoom[]>(() => {
+    return rooms.map((room: Room) => {
+      return {
+        id: room.id,
+        title: room.title,
+        description: room.description,
+        image: room.image,
+        slug: room.slug,
+        features: [
+          `Площа: ${room.area.toString().replace('.', ',')} м²`,
+          `Розміри (ШхГхВ): ${room.size ? `${room.size} см` : 'Не вказано'}`,
+          `Ціна за добу: ${room.price}₴`,
+        ],
+      };
+    });
+  }, [rooms]);
+
+  const openBookingModal = useCallback(
+    (room: CarouselRoom) => {
+      const matchedRoom = bookingRooms.find((candidate) => {
+        return candidate.title === room.title;
+      });
+
+      setInitialRoomId(matchedRoom?.id);
+      setBookingSuccess(false);
+      setIsBookingOpen(true);
+    },
+    [bookingRooms],
+  );
 
   const closeBookingModal = useCallback(() => {
     setIsBookingOpen(false);
     setBookingSuccess(false);
   }, []);
 
-  const handleBookingSubmit = useCallback(() => {
-    setBookingSuccess(true);
+  const handleBookingSubmit = useCallback(async (data: BookingCartSubmission) => {
+    try {
+      const response = await Api.bookings.createCheckout({
+        bookingItems: data.bookingItems.map((item) => {
+          return {
+            ...(typeof item.catId === 'number' ? { catId: item.catId } : {}),
+            ...(typeof item.petName === 'string' ? { petName: item.petName } : {}),
+            roomId: item.roomId,
+            serviceIds: item.services.map((service) => {
+              return service.serviceId;
+            }),
+          };
+        }),
+        customer: data.customer,
+        endDate: data.endDate,
+        startDate: data.startDate,
+      });
+
+      if (response.checkoutUrl) {
+        window.location.assign(response.checkoutUrl);
+        return;
+      }
+
+      setBookingSuccess(true);
+
+      if (response.message) {
+        toast.success(response.message);
+      }
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Не вдалося створити бронювання. Спробуйте ще раз.';
+      toast.error(message);
+    }
   }, []);
 
   useEffect(() => {
@@ -182,9 +288,9 @@ export function RoomsCarousel() {
         <div className="relative z-10">
           <Carousel setApi={setApi} opts={carouselOpts} className="w-full">
             <CarouselContent>
-              {CAROUSEL_ROOMS.map((room, index) => {
+              {carouselRooms.map((room, index) => {
                 return (
-                  <CarouselItem key={room.title} className="basis-full">
+                  <CarouselItem key={room.id} className="basis-full">
                     <RoomCard room={room} isPriority={index === 0} onBook={openBookingModal} />
                   </CarouselItem>
                 );
@@ -192,7 +298,7 @@ export function RoomsCarousel() {
             </CarouselContent>
 
             <div className="flex items-center justify-between mt-8 relative min-h-12">
-              <Dots count={CAROUSEL_ROOMS.length} current={current} onDotClick={handleDotClick} />
+              <Dots count={carouselRooms.length} current={current} onDotClick={handleDotClick} />
 
               <div className="hidden md:flex gap-4 ml-auto">
                 <CarouselPrevious className="static h-12 w-12 translate-y-0 border-none bg-white shadow-sm hover:bg-brand-yellow hover:text-white transition-all" />
@@ -212,6 +318,8 @@ export function RoomsCarousel() {
             }
           }}
           onSubmit={handleBookingSubmit}
+          rooms={bookingRooms}
+          initialRoomId={initialRoomId}
           success={bookingSuccess}
           onSuccessClose={closeBookingModal}
         />
