@@ -3,8 +3,10 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
-import { BookingModal } from '@/components/shared/BookingModal';
+import { BookingModal } from '@/components/shared/BookingPaymentModal';
+import type { BookingCartSubmission } from '@/components/shared/BookingPaymentModal';
 import {
   Carousel,
   type CarouselApi,
@@ -15,6 +17,7 @@ import {
 } from '@/components/ui/carousel';
 import { PawButton } from '@/components/ui/PawButton';
 import { cn } from '@/lib/utils';
+import { Api } from '@/services/api-clients';
 
 import { useRoomCatalog } from '../rooms/_hooks/useRoomCatalog';
 import type { Room } from '../rooms/_types/room';
@@ -196,8 +199,39 @@ export function RoomsCarousel() {
     setBookingSuccess(false);
   }, []);
 
-  const handleBookingSubmit = useCallback(() => {
-    setBookingSuccess(true);
+  const handleBookingSubmit = useCallback(async (data: BookingCartSubmission) => {
+    try {
+      const response = await Api.bookings.createCheckout({
+        bookingItems: data.bookingItems.map((item) => {
+          return {
+            ...(typeof item.catId === 'number' ? { catId: item.catId } : {}),
+            ...(typeof item.petName === 'string' ? { petName: item.petName } : {}),
+            roomId: item.roomId,
+            serviceIds: item.services.map((service) => {
+              return service.serviceId;
+            }),
+          };
+        }),
+        customer: data.customer,
+        endDate: data.endDate,
+        startDate: data.startDate,
+      });
+
+      if (response.checkoutUrl) {
+        window.location.assign(response.checkoutUrl);
+        return;
+      }
+
+      setBookingSuccess(true);
+
+      if (response.message) {
+        toast.success(response.message);
+      }
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Не вдалося створити бронювання. Спробуйте ще раз.';
+      toast.error(message);
+    }
   }, []);
 
   useEffect(() => {

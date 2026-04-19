@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/prisma/prisma-client';
 
 import { badRequest, requireAdminUser } from '../_lib';
+import { syncRoomsWithCount } from './_room-sync';
 
 type RoomCategoryCreateBody = {
   areaId?: number;
@@ -383,42 +384,59 @@ export async function POST(request: NextRequest) {
     const resolvedPerfectForIds = await resolvePerfectForIds(payload);
     const imageCreateInput = buildImageCreateInput(payload);
 
-    const roomCategory = await prisma.roomCategory.create({
-      data: {
-        areaId: resolvedAreaId,
-        description: payload.description,
-        ...(resolvedFeatureIds.length > 0
-          ? {
-              features: {
-                connect: resolvedFeatureIds.map((id) => ({ id })),
-              },
-            }
-          : {}),
-        ...(resolvedPerfectForIds.length > 0
-          ? {
-              perfectFor: {
-                connect: resolvedPerfectForIds.map((id) => ({ id })),
-              },
-            }
-          : {}),
-        name: payload.name,
-        price: payload.price,
-        roomCount: payload.roomCount ?? 1,
-        ...(imageCreateInput.length > 0
-          ? {
-              images: {
-                create: imageCreateInput,
-              },
-            }
-          : {}),
-      },
-      include: roomCategoryInclude,
+    const roomCategory = await prisma.$transaction(async (tx) => {
+      const createdRoomCategory = await tx.roomCategory.create({
+        data: {
+          areaId: resolvedAreaId,
+          description: payload.description,
+          ...(resolvedFeatureIds.length > 0
+            ? {
+                features: {
+                  connect: resolvedFeatureIds.map((id) => ({ id })),
+                },
+              }
+            : {}),
+          ...(resolvedPerfectForIds.length > 0
+            ? {
+                perfectFor: {
+                  connect: resolvedPerfectForIds.map((id) => ({ id })),
+                },
+              }
+            : {}),
+          name: payload.name,
+          price: payload.price,
+          roomCount: payload.roomCount ?? 1,
+          ...(imageCreateInput.length > 0
+            ? {
+                images: {
+                  create: imageCreateInput,
+                },
+              }
+            : {}),
+        },
+        include: roomCategoryInclude,
+      });
+
+      await syncRoomsWithCount(tx, {
+        categoryId: createdRoomCategory.id,
+        categoryName: createdRoomCategory.name,
+        roomCount: createdRoomCategory.roomCount,
+      });
+
+      return tx.roomCategory.findUniqueOrThrow({
+        where: { id: createdRoomCategory.id },
+        include: roomCategoryInclude,
+      });
     });
 
     return NextResponse.json({ roomCategory }, { status: 201 });
   } catch (error) {
     if (error instanceof Error && error.message === 'INVALID_AREA_INPUT') {
       return badRequest('Потрібно обрати існуючу площу або вказати габарити (Ш/Г/В).');
+    }
+
+    if (error instanceof Error && error.message === 'ROOM_COUNT_REDUCTION_BLOCKED') {
+      return badRequest('Неможливо зменшити кількість кімнат: частина кімнат уже має бронювання.');
     }
 
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {

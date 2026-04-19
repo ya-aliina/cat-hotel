@@ -45,3 +45,4 @@ next-env.d.ts
 .idea/
 *.iml
 
+.next-auth-debug.log

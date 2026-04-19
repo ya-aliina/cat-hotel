@@ -1,5 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
+import type { BookingCartSubmission } from '@/components/shared/BookingPaymentModal';
+import { Api } from '@/services/api-clients';
 import { useRoomCatalog } from '../../_hooks/useRoomCatalog';
 
 export function useRoomDetails(roomIdentifier: string) {
@@ -35,8 +38,39 @@ export function useRoomDetails(roomIdentifier: string) {
     setBookingSuccess(false);
   }, []);
 
-  const handleBookingSubmit = useCallback(() => {
-    setBookingSuccess(true);
+  const handleBookingSubmit = useCallback(async (data: BookingCartSubmission) => {
+    try {
+      const response = await Api.bookings.createCheckout({
+        bookingItems: data.bookingItems.map((item) => {
+          return {
+            ...(typeof item.catId === 'number' ? { catId: item.catId } : {}),
+            ...(typeof item.petName === 'string' ? { petName: item.petName } : {}),
+            roomId: item.roomId,
+            serviceIds: item.services.map((service) => {
+              return service.serviceId;
+            }),
+          };
+        }),
+        customer: data.customer,
+        endDate: data.endDate,
+        startDate: data.startDate,
+      });
+
+      if (response.checkoutUrl) {
+        window.location.assign(response.checkoutUrl);
+        return;
+      }
+
+      setBookingSuccess(true);
+
+      if (response.message) {
+        toast.success(response.message);
+      }
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Не вдалося створити бронювання. Спробуйте ще раз.';
+      toast.error(message);
+    }
   }, []);
 
   return {

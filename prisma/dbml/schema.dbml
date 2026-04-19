@@ -1,0 +1,274 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table User {
+  id Int [pk, increment]
+  name String [not null]
+  surname String [not null]
+  email String [unique, not null]
+  phone String
+  password String [not null]
+  role Role [not null, default: 'USER']
+  verified DateTime
+  provider String
+  providerId String
+  cats Cat [not null]
+  bookings Booking [not null]
+  reviews Review [not null]
+  reports CatReport [not null]
+  news News [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  verificationCodes VerificationCode [not null]
+}
+
+Table Cat {
+  id Int [pk, increment]
+  name String [not null]
+  breed String
+  birthDate DateTime
+  notes String
+  owner User [not null]
+  ownerId Int [not null]
+  reports CatReport [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  bookingItems BookingItem [not null]
+}
+
+Table CatReport {
+  id Int [pk, increment]
+  date DateTime [default: `now()`, not null]
+  notes String [not null]
+  images ReportImage [not null]
+  cat Cat [not null]
+  catId Int [not null]
+  employeeId Int [not null]
+  employee User [not null]
+}
+
+Table ReportImage {
+  id Int [pk, increment]
+  url String [not null]
+  reportId Int [not null]
+  report CatReport [not null]
+}
+
+Table RoomCategory {
+  id Int [pk, increment]
+  name String [unique, not null]
+  description String
+  price Decimal [not null]
+  roomCount Int [not null, default: 1]
+  rooms Room [not null]
+  features Feature [not null]
+  images RoomCategoryImage [not null]
+  perfectFor PerfectForItem [not null]
+  area RoomArea [not null]
+  areaId Int [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table RoomCategoryImage {
+  id Int [pk, increment]
+  isCover Boolean [not null, default: false]
+  url String [not null]
+  sortOrder Int [not null, default: 0]
+  roomCategory RoomCategory [not null]
+  roomCategoryId Int [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+
+  indexes {
+    (roomCategoryId, sortOrder) [unique]
+  }
+}
+
+Table PerfectForItem {
+  id Int [pk, increment]
+  description String [unique, not null]
+  imageUrl String [not null]
+  roomCategories RoomCategory [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Room {
+  id Int [pk, increment]
+  name String [not null]
+  category RoomCategory [not null]
+  categoryId Int [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  bookingItems BookingItem [not null]
+}
+
+Table RoomArea {
+  id Int [pk, increment]
+  value Float [unique, not null]
+  widthCm Int [not null]
+  depthCm Int [not null]
+  heightCm Int [not null]
+  categories RoomCategory [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Feature {
+  id Int [pk, increment]
+  name String [unique, not null]
+  price Decimal [not null]
+  imageUrl String [not null]
+  roomCategories RoomCategory [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Service {
+  id Int [pk, increment]
+  name String [unique, not null]
+  price Decimal [not null]
+  description String
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  bookingItemServices BookingItemService [not null]
+}
+
+Table Review {
+  id Int [pk, increment]
+  rating Int [not null]
+  comment String
+  user User [not null]
+  userId Int [not null]
+  booking Booking
+  bookingId Int [unique]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table BookingItem {
+  id Int [pk, increment]
+  booking Booking [not null]
+  bookingId Int [not null]
+  room Room [not null]
+  roomId Int [not null]
+  cat Cat [not null]
+  catId Int [not null]
+  services BookingItemService [not null]
+  priceAtBooking Decimal [not null]
+}
+
+Table BookingItemService {
+  id Int [pk, increment]
+  bookingItem BookingItem [not null]
+  bookingItemId Int [not null]
+  service Service [not null]
+  serviceId Int [not null]
+  quantity Int [not null, default: 1]
+  price Decimal [not null]
+}
+
+Table Booking {
+  id Int [pk, increment]
+  startDate DateTime [not null]
+  endDate DateTime [not null]
+  totalPrice Decimal [not null]
+  status BookingStatus [not null, default: 'PENDING']
+  user User [not null]
+  userId Int [not null]
+  bookingItems BookingItem [not null]
+  review Review
+  paymentId String [unique]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table News {
+  id Int [pk, increment]
+  title String [not null]
+  content String [not null]
+  imageUrl String
+  isPublished Boolean [not null, default: false]
+  author User [not null]
+  authorId Int [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table VerificationCode {
+  id Int [pk, increment]
+  code String [unique, not null]
+  purpose VerificationCodePurpose [not null]
+  expiresAt DateTime [not null]
+  consumedAt DateTime
+  user User [not null]
+  userId Int [not null]
+  createdAt DateTime [default: `now()`, not null]
+
+  indexes {
+    (code, userId) [unique]
+  }
+}
+
+Table FeatureToRoomCategory {
+  featuresId Int [ref: > Feature.id]
+  roomcategoriesId Int [ref: > RoomCategory.id]
+}
+
+Table PerfectForItemToRoomCategory {
+  perfectforId Int [ref: > PerfectForItem.id]
+  roomcategoriesId Int [ref: > RoomCategory.id]
+}
+
+Enum Role {
+  USER
+  EMPLOYEE
+  ADMIN
+}
+
+Enum BookingStatus {
+  PENDING
+  SUCCEEDED
+  CANCELLED
+}
+
+Enum VerificationCodePurpose {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
+Ref: Cat.ownerId > User.id
+
+Ref: CatReport.catId > Cat.id [delete: Cascade]
+
+Ref: CatReport.employeeId > User.id
+
+Ref: ReportImage.reportId > CatReport.id [delete: Cascade]
+
+Ref: RoomCategory.areaId > RoomArea.id
+
+Ref: RoomCategoryImage.roomCategoryId > RoomCategory.id [delete: Cascade]
+
+Ref: Room.categoryId > RoomCategory.id
+
+Ref: Review.userId > User.id [delete: Cascade]
+
+Ref: Review.bookingId - Booking.id [delete: Set Null]
+
+Ref: BookingItem.bookingId > Booking.id [delete: Cascade]
+
+Ref: BookingItem.roomId > Room.id
+
+Ref: BookingItem.catId > Cat.id
+
+Ref: BookingItemService.bookingItemId > BookingItem.id [delete: Cascade]
+
+Ref: BookingItemService.serviceId > Service.id
+
+Ref: Booking.userId > User.id
+
+Ref: News.authorId > User.id
+
+Ref: VerificationCode.userId > User.id [delete: Cascade]

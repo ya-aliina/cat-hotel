@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
 import { ContactSection } from '@/app/_components/ContactSection';
-import { BookingModal } from '@/components/shared/BookingModal';
+import { BookingModal } from '@/components/shared/BookingPaymentModal';
 import { PawButton } from '@/components/ui/PawButton';
 
 import type { RoomFeature } from '../_types/room';

@@ -5,6 +5,7 @@ import { deleteBlobIfUnused } from '@/lib/blob-cleanup';
 import { prisma } from '@/prisma/prisma-client';
 
 import { parsePositiveIntId, requireAdminUser } from '../../_lib';
+import { syncRoomsWithCount } from '../_room-sync';
 
 type RoomCategoryItemRouteContext = {
   params: Promise<{
@@ -190,8 +191,17 @@ export async function PATCH(request: NextRequest, context: RoomCategoryItemRoute
         include: roomCategoryInclude,
       });
 
+      await syncRoomsWithCount(tx, {
+        categoryId: updatedRoomCategory.id,
+        categoryName: updatedRoomCategory.name,
+        roomCount: updatedRoomCategory.roomCount,
+      });
+
       if (!hasImagePayload) {
-        return updatedRoomCategory;
+        return tx.roomCategory.findUniqueOrThrow({
+          where: { id },
+          include: roomCategoryInclude,
+        });
       }
 
       const imageCreateInput = buildImageCreateInput(payload);
@@ -248,6 +258,13 @@ export async function PATCH(request: NextRequest, context: RoomCategoryItemRoute
       if (error.code === 'P2002') {
         return NextResponse.json({ error: 'Категорія з такою назвою вже існує.' }, { status: 409 });
       }
+    }
+
+    if (error instanceof Error && error.message === 'ROOM_COUNT_REDUCTION_BLOCKED') {
+      return NextResponse.json(
+        { error: 'Неможливо зменшити кількість кімнат: частина кімнат уже має бронювання.' },
+        { status: 400 },
+      );
     }
 
     return NextResponse.json({ error: 'Не вдалося оновити категорію номера.' }, { status: 500 });

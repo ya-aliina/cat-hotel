@@ -1,9 +1,11 @@
 'use client';
 
 import { ChevronDown, Filter } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
-import { BookingModal } from '@/components/shared/BookingModal';
+import { type BookingCartSubmission, BookingModal } from '@/components/shared/BookingPaymentModal';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Api } from '@/services/api-clients';
 
 import { ContactSection } from '../_components/ContactSection';
 import { FiltersPanel } from './_components/FiltersPanel';
@@ -25,7 +28,22 @@ const SORT_LABELS: Record<SortOption, string> = {
   'price-desc': '↓ По ціні',
 };
 
+type PaymentNoticeTone = 'info' | 'success' | 'warning';
+
+type PaymentNotice = {
+  description: string;
+  title: string;
+  tone: PaymentNoticeTone;
+};
+
+const paymentNoticeStyles: Record<PaymentNoticeTone, string> = {
+  info: 'border-blue-200 bg-blue-50 text-blue-900',
+  success: 'border-emerald-200 bg-emerald-50 text-emerald-900',
+  warning: 'border-amber-200 bg-amber-50 text-amber-900',
+};
+
 export default function RoomsPage() {
+  const router = useRouter();
   const {
     sort,
     setSort,
@@ -42,6 +60,107 @@ export default function RoomsPage() {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [initialRoomId, setInitialRoomId] = useState<string>();
+  const [paymentNotice, setPaymentNotice] = useState<PaymentNotice | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const queryParams = new URLSearchParams(window.location.search);
+    const paymentParam = queryParams.get('payment');
+    const bookingIdParam = queryParams.get('bookingId');
+
+    if (!paymentParam || !bookingIdParam) {
+      return;
+    }
+
+    if (paymentParam !== 'success' && paymentParam !== 'cancelled') {
+      return;
+    }
+
+    const bookingId = Number(bookingIdParam);
+
+    let cancelled = false;
+
+    async function resolveBookingStatus() {
+      if (!Number.isInteger(bookingId) || bookingId <= 0) {
+        setPaymentNotice({
+          description: 'Не вдалося визначити номер бронювання у відповіді платіжної системи.',
+          title: 'Некоректні параметри оплати',
+          tone: 'warning',
+        });
+
+        return;
+      }
+
+      try {
+        const booking = await Api.bookings.getById(bookingId);
+
+        if (cancelled) {
+          return;
+        }
+
+        if (paymentParam === 'cancelled') {
+          setPaymentNotice({
+            description: `Бронювання #${bookingId} залишилося зі статусом ${booking.status}. Ви можете повторити оплату пізніше.`,
+            title: 'Оплату скасовано',
+            tone: 'warning',
+          });
+
+          return;
+        }
+
+        if (booking.status === 'SUCCEEDED') {
+          setPaymentNotice({
+            description: `Бронювання #${bookingId} успішно оплачене. Дякуємо!`,
+            title: 'Оплату підтверджено',
+            tone: 'success',
+          });
+
+          return;
+        }
+
+        if (booking.status === 'PENDING') {
+          setPaymentNotice({
+            description:
+              'Платіж отримано, але підтвердження ще обробляється. Оновіть сторінку за кілька секунд.',
+            title: `Бронювання #${bookingId} очікує підтвердження`,
+            tone: 'info',
+          });
+
+          return;
+        }
+
+        setPaymentNotice({
+          description: `Бронювання #${bookingId} має статус ${booking.status}. За потреби зверніться до адміністратора.`,
+          title: 'Статус оплати змінено',
+          tone: 'warning',
+        });
+      } catch {
+        if (cancelled) {
+          return;
+        }
+
+        setPaymentNotice({
+          description: `Не вдалося завантажити статус бронювання #${bookingId}. Спробуйте оновити сторінку.`,
+          title: 'Помилка перевірки оплати',
+          tone: 'warning',
+        });
+      }
+    }
+
+    resolveBookingStatus();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const clearPaymentNotice = useCallback(() => {
+    setPaymentNotice(null);
+    router.replace('/rooms', { scroll: false });
+  }, [router]);
 
   const openBookingModal = (roomId?: string) => {
     setInitialRoomId(roomId);
@@ -58,13 +177,69 @@ export default function RoomsPage() {
     closeBookingModal();
   };
 
-  const handleBookingSubmit = useCallback(() => {
-    setBookingSuccess(true);
+  const handleBookingSubmit = useCallback(async (data: BookingCartSubmission) => {
+    try {
+      const response = await Api.bookings.createCheckout({
+        bookingItems: data.bookingItems.map((item) => {
+          return {
+            ...(typeof item.catId === 'number' ? { catId: item.catId } : {}),
+            ...(typeof item.petName === 'string' ? { petName: item.petName } : {}),
+            roomId: item.roomId,
+            serviceIds: item.services.map((service) => {
+              return service.serviceId;
+            }),
+          };
+        }),
+        customer: data.customer,
+        endDate: data.endDate,
+        startDate: data.startDate,
+      });
+
+      if (response.checkoutUrl) {
+        window.location.assign(response.checkoutUrl);
+        return;
+      }
+
+      setBookingSuccess(true);
+
+      if (response.message) {
+        toast.success(response.message);
+      }
+    } catch (error) {
+      const axiosError = error as { response?: { data?: { error?: string } } };
+      const message =
+        typeof axiosError?.response?.data?.error === 'string'
+          ? axiosError.response.data.error
+          : error instanceof Error
+            ? error.message
+            : 'Не вдалося створити бронювання. Спробуйте ще раз.';
+      toast.error(message);
+    }
   }, []);
 
   return (
     <main className="min-h-screen bg-brand-surface">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-24">
+        {paymentNotice ? (
+          <div
+            className={`mb-8 rounded-2xl border px-4 py-4 sm:px-5 sm:py-5 ${paymentNoticeStyles[paymentNotice.tone]}`}
+          >
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p className="text-lg font-bold">{paymentNotice.title}</p>
+                <p className="mt-1 text-sm opacity-90">{paymentNotice.description}</p>
+              </div>
+              <button
+                type="button"
+                className="inline-flex h-10 items-center justify-center rounded-full border border-current px-5 text-sm font-semibold"
+                onClick={clearPaymentNotice}
+              >
+                Закрити
+              </button>
+            </div>
+          </div>
+        ) : null}
+
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
           <h1 className="text-4xl font-bold text-brand-text">Наші номери</h1>
 
