@@ -20,7 +20,7 @@ export const RelatedRooms = memo(function RelatedRooms({ rooms }: RelatedRoomsPr
             return (
               <Link
                 key={r.id}
-                href={`/rooms/${r.slug}`}
+                href={`/rooms/${r.id}`}
                 className="group rounded-3xl overflow-hidden bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all"
               >
                 <div className="relative aspect-16/10">

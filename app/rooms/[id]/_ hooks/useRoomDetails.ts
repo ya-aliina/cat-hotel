@@ -13,7 +13,7 @@ export function useRoomDetails(roomIdentifier: string) {
 
   const room = useMemo(() => {
     return rooms.find((r) => {
-      return r.slug === roomIdentifier || r.id === roomIdentifier;
+      return r.id === roomIdentifier;
     });
   }, [roomIdentifier, rooms]);
 

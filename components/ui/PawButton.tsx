@@ -29,6 +29,7 @@ interface PawButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
   children: ReactNode;
   variant?: PawVariant;
+  icon?: ReactNode;
 }
 
 export const PawButton = ({
@@ -38,6 +39,7 @@ export const PawButton = ({
   disabled,
   variant = 'default',
   type = 'button',
+  icon,
   ...props
 }: PawButtonProps) => {
   const style = variants[variant];
@@ -62,7 +64,7 @@ export const PawButton = ({
           style.circle,
         )}
       >
-        <PawIcon className={cn('h-5 w-5', style.icon)} />
+        {icon ?? <PawIcon className={cn('h-5 w-5', style.icon)} />}
       </span>
     </button>
   );
