@@ -22,6 +22,5 @@ export interface Room {
   perfectFor: RoomMarketingPoint[];
   price: number;
   size: string;
-  slug: string;
   title: string;
 }

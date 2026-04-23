@@ -17,7 +17,7 @@ export function RoomCard({ imagePriority = false, room, onBook }: RoomCardProps)
   const router = useRouter();
 
   const handleNavigateToDetails = () => {
-    router.push(`/rooms/${room.slug}`);
+    router.push(`/rooms/${room.id}`);
   };
 
   return (

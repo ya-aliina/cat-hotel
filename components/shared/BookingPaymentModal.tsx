@@ -256,7 +256,6 @@ export function BookingModal({
   const hasCompleteSessionCustomer =
     sessionCustomer.name.length >= 2 &&
     sessionCustomer.surname.length >= 2 &&
-    /^\+?\d{10,15}$/.test(sessionCustomer.phone) &&
     /.+@.+\..+/.test(sessionCustomer.email);
   const [pets, setPets] = useState<AccountPet[]>([]);
   const [petsLoading, setPetsLoading] = useState(false);
@@ -441,7 +440,7 @@ export function BookingModal({
 
                   {!hasCompleteSessionCustomer && isAuthenticated ? (
                     <div className="rounded-[20px] border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                      У профілі не вистачає контактних даних. Заповніть їх у розділі Мій акаунт.
+                      У профілі не вистачає імені, прізвища або email. Заповніть їх у розділі Мій акаунт.
                     </div>
                   ) : null}
 

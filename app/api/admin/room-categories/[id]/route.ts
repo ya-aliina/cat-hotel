@@ -144,7 +144,10 @@ export async function GET(_request: Request, context: RoomCategoryItemRouteConte
       return NextResponse.json({ error: 'Некоректний id категорії.' }, { status: 400 });
     }
 
-    return NextResponse.json({ error: 'Не вдалося завантажити категорію номера.' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Не вдалося завантажити категорію номера.' },
+      { status: 500 },
+    );
   }
 }
 
@@ -184,7 +187,9 @@ export async function PATCH(request: NextRequest, context: RoomCategoryItemRoute
             : {}),
           ...(typeof payload.name === 'string' ? { name: payload.name.trim() } : {}),
           ...(typeof payload.price === 'string' ? { price: payload.price.trim() } : {}),
-          ...(typeof payload.roomCount === 'number' && Number.isInteger(payload.roomCount) && payload.roomCount > 0
+          ...(typeof payload.roomCount === 'number' &&
+          Number.isInteger(payload.roomCount) &&
+          payload.roomCount > 0
             ? { roomCount: payload.roomCount }
             : {}),
         },
@@ -315,7 +320,7 @@ export async function DELETE(_request: Request, context: RoomCategoryItemRouteCo
 
       if (error.code === 'P2003') {
         return NextResponse.json(
-          { error: 'Неможливо видалити категорію: є пов\'язані номери або дані.' },
+          { error: "Неможливо видалити категорію: є пов\'язані номери або дані." },
           { status: 400 },
         );
       }

@@ -27,7 +27,6 @@ type CarouselRoom = {
   features: string[];
   id: string;
   image: string;
-  slug: string;
   title: string;
 };
 
@@ -44,7 +43,7 @@ const RoomCard = React.memo(
     const router = useRouter();
 
     const handleNavigateToDetails = () => {
-      router.push(`/rooms/${room.slug}`);
+      router.push(`/rooms/${room.id}`);
     };
 
     return (
@@ -171,7 +170,6 @@ export function RoomsCarousel() {
         title: room.title,
         description: room.description,
         image: room.image,
-        slug: room.slug,
         features: [
           `Площа: ${room.area.toString().replace('.', ',')} м²`,
           `Розміри (ШхГхВ): ${room.size ? `${room.size} см` : 'Не вказано'}`,
