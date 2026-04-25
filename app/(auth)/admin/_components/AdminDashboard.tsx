@@ -953,17 +953,6 @@ export function AdminDashboard() {
             </Button>
           </div>
 
-          {categoryOptions.length > 0 && (
-            <p className="mt-4 text-[13px] text-brand-text-subtle">
-              Доступні категорії:{' '}
-              {categoryOptions
-                .map((item) => {
-                  return `${item.id} (${item.name})`;
-                })
-                .join(', ')}
-            </p>
-          )}
-
           <div className="mt-6 space-y-3">
             {rooms.map((room) => {
               return (

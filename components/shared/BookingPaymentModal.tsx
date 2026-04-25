@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { XIcon } from 'lucide-react';
+import { ChevronDown, XIcon } from 'lucide-react';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
@@ -392,7 +392,7 @@ export function BookingModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[calc(100%-1.5rem)] sm:w-full max-w-140 p-0 bg-transparent shadow-none ring-0">
         <div className="w-full flex justify-center relative z-10">
-          <div className="w-full max-h-[90vh] overflow-y-auto bg-white rounded-[24px] sm:rounded-[30px] shadow-xl p-5 sm:p-8 md:p-12 relative overflow-x-hidden transition-all duration-500">
+          <div className="w-full max-h-[90vh] overflow-y-auto bg-white rounded-[24px] sm:rounded-[30px] shadow-xl p-5 sm:p-8 relative overflow-x-hidden transition-all duration-500 space-y-8">
             <button
               type="button"
               onClick={() => {
@@ -418,7 +418,7 @@ export function BookingModal({
               <SuccessView onClose={onSuccessClose} />
             ) : (
               <>
-                <div className="mb-6 text-center">
+                <div className="mb-6 px-12 text-center">
                   <h1 className="text-[28px] font-bold text-brand-text">Забронювати номер</h1>
                 </div>
 
@@ -428,11 +428,7 @@ export function BookingModal({
                   })}
                   className="space-y-5"
                 >
-                  {isAuthenticated ? (
-                    <div className="rounded-[20px] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
-                      Контактні дані буде використано автоматично з вашого профілю.
-                    </div>
-                  ) : (
+                  {isAuthenticated ? null : (
                     <div className="rounded-[20px] border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
                       Для оплати потрібно увійти в акаунт.
                     </div>
@@ -440,7 +436,8 @@ export function BookingModal({
 
                   {!hasCompleteSessionCustomer && isAuthenticated ? (
                     <div className="rounded-[20px] border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                      У профілі не вистачає імені, прізвища або email. Заповніть їх у розділі Мій акаунт.
+                      У профілі не вистачає імені, прізвища або email. Заповніть їх у розділі Мій
+                      акаунт.
                     </div>
                   ) : null}
 
@@ -470,29 +467,14 @@ export function BookingModal({
                     </div>
                   </div>
 
-                  <div className="space-y-4 rounded-[24px] border border-gray-100 bg-[#FFF9F2] p-4 sm:p-6">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="space-y-4">
+                    <div className="flex flex-col gap-3 ">
                       <div>
                         <h2 className="text-lg font-bold text-brand-text">Позиції бронювання</h2>
                         <p className="text-sm text-brand-text-soft">
                           Для кожної кімнати можна окремо вибрати улюбленця та додаткові послуги.
                         </p>
                       </div>
-
-                      <PawButton
-                        type="button"
-                        className="min-w-40 border border-brand-orange bg-white text-brand-orange"
-                        onClick={() => {
-                          append({
-                            catId: pets[0] ? String(pets[0].id) : NEW_PET_OPTION,
-                            newPetName: '',
-                            roomId: '',
-                            serviceIds: [],
-                          });
-                        }}
-                      >
-                        Додати номер
-                      </PawButton>
                     </div>
 
                     {typeof errors.items?.message === 'string' ? (
@@ -534,11 +516,11 @@ export function BookingModal({
                                 <label className="mb-1 ml-4 block text-sm text-gray-600">
                                   Мої улюбленці
                                 </label>
-                                <div className="w-full">
+                                <div className="relative w-full">
                                   <select
                                     {...register(`items.${index}.catId` as const)}
                                     className={cn(
-                                      'h-13 w-full rounded-full border bg-white px-6 text-[16px] focus:outline-none',
+                                      'h-13 w-full appearance-none rounded-full border bg-white pl-6 pr-10 text-[16px] focus:outline-none',
                                       errors.items?.[index]?.catId
                                         ? 'border-destructive/70 focus:border-destructive'
                                         : 'border-gray-200 focus:border-brand-yellow',
@@ -556,6 +538,7 @@ export function BookingModal({
                                       + Додати нового улюбленця
                                     </option>
                                   </select>
+                                  <ChevronDown className="pointer-events-none absolute top-1/2 right-4 h-4 w-4 -translate-y-1/2 text-gray-400" />
                                   {errors.items?.[index]?.catId?.message ? (
                                     <p className="mt-1 ml-4 text-sm text-destructive">
                                       {errors.items[index]?.catId?.message}
@@ -582,11 +565,11 @@ export function BookingModal({
                                 <label className="mb-1 ml-4 block text-sm text-gray-600">
                                   Номер
                                 </label>
-                                <div className="w-full">
+                                <div className="relative w-full">
                                   <select
                                     {...register(`items.${index}.roomId` as const)}
                                     className={cn(
-                                      'h-13 w-full rounded-full border bg-white px-6 text-[16px] focus:outline-none',
+                                      'h-13 w-full appearance-none rounded-full border bg-white pl-6 pr-10 text-[16px] focus:outline-none',
                                       errors.items?.[index]?.roomId
                                         ? 'border-destructive/70 focus:border-destructive'
                                         : 'border-gray-200 focus:border-brand-yellow',
@@ -601,6 +584,7 @@ export function BookingModal({
                                       );
                                     })}
                                   </select>
+                                  <ChevronDown className="pointer-events-none absolute top-1/2 right-4 h-4 w-4 -translate-y-1/2 text-gray-400" />
                                   {errors.items?.[index]?.roomId?.message ? (
                                     <p className="mt-1 ml-4 text-sm text-destructive">
                                       {errors.items[index]?.roomId?.message}
@@ -664,6 +648,21 @@ export function BookingModal({
                       })}
                     </div>
                   </div>
+
+                  <PawButton
+                    type="button"
+                    className="min-w-40 border border-brand-orange bg-white text-brand-orange m-auto mb-5"
+                    onClick={() => {
+                      append({
+                        catId: pets[0] ? String(pets[0].id) : NEW_PET_OPTION,
+                        newPetName: '',
+                        roomId: '',
+                        serviceIds: [],
+                      });
+                    }}
+                  >
+                    Додати номер
+                  </PawButton>
 
                   <div className="rounded-[24px] bg-brand-surface px-5 py-4 text-center">
                     <p className="text-sm text-brand-text-soft">Загальна сума бронювання</p>

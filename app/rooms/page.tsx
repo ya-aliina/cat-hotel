@@ -245,7 +245,7 @@ export default function RoomsPage() {
 
           <div className="flex items-center justify-between w-full md:w-auto">
             {/* Мобільний фільтр */}
-            <div className="md:hidden">
+            <div className="lg:hidden">
               <Sheet>
                 <SheetTrigger
                   nativeButton={false}
@@ -255,7 +255,7 @@ export default function RoomsPage() {
                         {...props}
                         role="button"
                         tabIndex={0}
-                        className="flex items-center justify-center gap-2 bg-white h-12 px-6 rounded-full border border-gray-100 text-[16px] shadow-sm hover:bg-gray-50 transition-colors whitespace-nowrap text-brand-text"
+                        className="flex items-center justify-center mr-4 gap-2 bg-white h-12 px-6 rounded-full border border-gray-100 text-[16px] shadow-sm hover:bg-gray-50 transition-colors whitespace-nowrap text-brand-text"
                       >
                         <Filter size={18} className="text-brand-orange" />
                         <span>Фільтри</span>
@@ -314,7 +314,7 @@ export default function RoomsPage() {
 
         <div className="flex flex-col md:flex-row items-start gap-12">
           {/* Десктопний сайдбар */}
-          <aside className="hidden md:block w-64 shrink-0">
+          <aside className="hidden lg:block w-64 shrink-0">
             <FiltersPanel
               draftFilters={draftFilters}
               onDraftFiltersChange={setDraftFilters}
@@ -325,7 +325,8 @@ export default function RoomsPage() {
 
           {/* Сітка кімнат */}
           {isLoading ? (
-            <div className="grow grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+            <div className="grow grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8 w-full">
+              {' '}
               {Array.from({ length: 6 }).map((_, index) => {
                 return (
                   <div key={index} className="h-full md:max-w-90 w-full">
@@ -350,10 +351,11 @@ export default function RoomsPage() {
               </div>
             </div>
           ) : (
-            <div className="grow grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+            <div className="grow grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8 w-full">
+              {' '}
               {sortedAndFilteredRooms.map((room, index) => {
                 return (
-                  <div key={room.id} className="h-full  md:max-w-90 w-full">
+                  <div key={room.id} className="h-full w-full">
                     <RoomCard
                       imagePriority={index < 3}
                       room={room}

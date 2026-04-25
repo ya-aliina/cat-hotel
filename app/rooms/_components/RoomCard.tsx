@@ -31,7 +31,7 @@ export function RoomCard({ imagePriority = false, room, onBook }: RoomCardProps)
           handleNavigateToDetails();
         }
       }}
-      className="bg-white rounded-[8px] shadow-[0px_4px_20px_rgba(0,0,0,0.03)] border border-gray-100 flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
+      className="bg-white min-w-[260px] rounded-[8px] shadow-[0px_4px_20px_rgba(0,0,0,0.03)] border border-gray-100 flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
     >
       <div className="relative h-50 w-full">
         {room.image ? (
