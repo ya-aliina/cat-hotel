@@ -16,8 +16,10 @@ export async function POST(request: Request) {
       );
     }
 
+    const normalizedEmail = parsedBody.data.email.toLowerCase();
+
     const user = await prisma.user.findUnique({
-      where: { email: parsedBody.data.email },
+      where: { email: normalizedEmail },
       select: {
         email: true,
         id: true,
@@ -25,6 +27,12 @@ export async function POST(request: Request) {
     });
 
     if (!user) {
+      if (process.env.EMAIL_DEBUG === 'true') {
+        console.info('[forgot-password] no user found, skipping email delivery', {
+          email: normalizedEmail,
+        });
+      }
+
       return NextResponse.json(
         { message: 'Якщо акаунт існує, ми надіслали інструкцію для відновлення пароля.' },
         { status: 200 },
