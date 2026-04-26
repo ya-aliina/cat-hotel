@@ -50,7 +50,7 @@ export const PawButton = ({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        'flex items-center justify-between gap-4 rounded-full p-2 pl-6 font-medium shadow cursor-pointer transition-transform duration-300 ease-out hover:scale-[1.03] active:scale-95 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100 disabled:active:scale-100',
+        'flex cursor-pointer items-center justify-between gap-4 rounded-full p-2 pl-6 font-medium shadow cursor-pointer transition-transform duration-300 ease-out hover:scale-[1.03] active:scale-95 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100 disabled:active:scale-100',
         style.button,
         className,
       )}

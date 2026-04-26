@@ -54,6 +54,8 @@ export const bookingSchema = z
         z.object({
           catId: z.string().min(1, 'Оберіть улюбленця'),
           newPetName: z.string().default(''),
+          secondCatId: z.string().default(''),
+          secondNewPetName: z.string().default(''),
           roomId: z.string().min(1, 'Оберіть номер'),
           serviceIds: z.array(z.string()),
         }),
@@ -61,6 +63,8 @@ export const bookingSchema = z
       .min(1, 'Додайте хоча б один номер до бронювання'),
   })
   .superRefine((data, context) => {
+    const selectedCatIds = new Map<string, number>();
+
     data.items.forEach((item, index) => {
       if (item.catId === NEW_PET_OPTION) {
         const parsed = petNameField.safeParse(item.newPetName ?? '');
@@ -76,13 +80,72 @@ export const bookingSchema = z
         return;
       }
 
-      if (!Number.isInteger(Number(item.catId)) || Number(item.catId) <= 0) {
+      if (
+        item.catId !== NEW_PET_OPTION &&
+        (!Number.isInteger(Number(item.catId)) || Number(item.catId) <= 0)
+      ) {
         context.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'Оберіть улюбленця',
           path: ['items', index, 'catId'],
         });
       }
+
+      if (item.secondCatId === NEW_PET_OPTION) {
+        const parsedSecond = petNameField.safeParse(item.secondNewPetName ?? '');
+
+        if (!parsedSecond.success) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: parsedSecond.error.issues[0]?.message ?? "Введіть ім'я улюбленця",
+            path: ['items', index, 'secondNewPetName'],
+          });
+        }
+      }
+
+      if (
+        item.secondCatId &&
+        item.secondCatId !== NEW_PET_OPTION &&
+        (!Number.isInteger(Number(item.secondCatId)) || Number(item.secondCatId) <= 0)
+      ) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Оберіть улюбленця',
+          path: ['items', index, 'secondCatId'],
+        });
+      }
+
+      if (
+        item.secondCatId &&
+        item.secondCatId !== NEW_PET_OPTION &&
+        item.catId !== NEW_PET_OPTION &&
+        item.secondCatId === item.catId
+      ) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Оберіть іншого улюбленця для другої позиції',
+          path: ['items', index, 'secondCatId'],
+        });
+      }
+
+      [
+        { path: ['items', index, 'catId'], value: item.catId },
+        { path: ['items', index, 'secondCatId'], value: item.secondCatId },
+      ].forEach(({ path, value }) => {
+        if (!value || value === NEW_PET_OPTION) {
+          return;
+        }
+
+        if (selectedCatIds.has(value)) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Цього улюбленця вже додано в іншу позицію бронювання',
+            path,
+          });
+        }
+
+        selectedCatIds.set(value, index);
+      });
     });
   })
   .refine(
@@ -111,8 +174,10 @@ export type BookingCartSubmission = {
   startDate: string;
   totalPrice: number;
   bookingItems: Array<{
-    catId?: number;
-    petName?: string;
+    pets: Array<{
+      catId?: number;
+      petName?: string;
+    }>;
     priceAtBooking: number;
     roomId: number;
     services: Array<{
@@ -138,7 +203,16 @@ function createDefaultValues(initialRoomId?: string): BookingFormState {
   return {
     dateFrom: '',
     dateTo: '',
-    items: [{ catId: '', newPetName: '', roomId: initialRoomId ?? '', serviceIds: [] }],
+    items: [
+      {
+        catId: '',
+        newPetName: '',
+        secondCatId: '',
+        secondNewPetName: '',
+        roomId: initialRoomId ?? '',
+        serviceIds: [],
+      },
+    ],
   };
 }
 
@@ -196,10 +270,25 @@ function buildBookingSubmission(
         };
       });
 
+    const pets = [
+      {
+        ...(item.catId === NEW_PET_OPTION
+          ? { petName: (item.newPetName ?? '').trim() }
+          : { catId: Number(item.catId) }),
+      },
+      ...(item.secondCatId
+        ? [
+            {
+              ...(item.secondCatId === NEW_PET_OPTION
+                ? { petName: (item.secondNewPetName ?? '').trim() }
+                : { catId: Number(item.secondCatId) }),
+            },
+          ]
+        : []),
+    ];
+
     return {
-      ...(item.catId === NEW_PET_OPTION
-        ? { petName: (item.newPetName ?? '').trim() }
-        : { catId: Number(item.catId) }),
+      pets,
       priceAtBooking: roomPrice * nights,
       roomId: Number(item.roomId),
       services,
@@ -287,6 +376,8 @@ export function BookingModal({
         return {
           catId: item.catId ?? '',
           newPetName: item.newPetName ?? '',
+          secondCatId: item.secondCatId ?? '',
+          secondNewPetName: item.secondNewPetName ?? '',
           roomId: item.roomId ?? '',
           serviceIds: item.serviceIds ?? [],
         };
@@ -485,8 +576,16 @@ export function BookingModal({
                       {fields.map((field, index) => {
                         const selectedServiceIds = values.items[index]?.serviceIds ?? [];
                         const selectedCatId = values.items[index]?.catId ?? '';
+                        const selectedSecondCatId = values.items[index]?.secondCatId ?? '';
                         const showNewPetField = selectedCatId === NEW_PET_OPTION;
-                        const summary = roomSummaries[index];
+                        const showSecondNewPetField = selectedSecondCatId === NEW_PET_OPTION;
+                        const summary = roomSummaries[index] ?? {
+                          roomTitle: 'Номер не обрано',
+
+                          roomPrice: 0,
+
+                          servicesTotal: 0,
+                        };
 
                         return (
                           <div
@@ -558,6 +657,50 @@ export function BookingModal({
                                   placeholder="Ім'я нового улюбленця"
                                   {...register(`items.${index}.newPetName` as const)}
                                   error={errors.items?.[index]?.newPetName?.message}
+                                />
+                              ) : null}
+
+                              <div>
+                                <label className="mb-1 ml-4 block text-sm text-gray-600">
+                                  Другий улюбленець (необов&apos;язково)
+                                </label>
+                                <div className="relative w-full">
+                                  <select
+                                    {...register(`items.${index}.secondCatId` as const)}
+                                    className={cn(
+                                      'h-13 w-full appearance-none rounded-full border bg-white pl-6 pr-10 text-[16px] focus:outline-none',
+                                      errors.items?.[index]?.secondCatId
+                                        ? 'border-destructive/70 focus:border-destructive'
+                                        : 'border-gray-200 focus:border-brand-yellow',
+                                    )}
+                                  >
+                                    <option value="">Без другого улюбленця</option>
+                                    {pets.map((pet) => {
+                                      return (
+                                        <option key={pet.id} value={String(pet.id)}>
+                                          {pet.name}
+                                        </option>
+                                      );
+                                    })}
+                                    <option value={NEW_PET_OPTION}>
+                                      + Додати нового улюбленця
+                                    </option>
+                                  </select>
+                                  <ChevronDown className="pointer-events-none absolute top-1/2 right-4 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                                  {errors.items?.[index]?.secondCatId?.message ? (
+                                    <p className="mt-1 ml-4 text-sm text-destructive">
+                                      {errors.items[index]?.secondCatId?.message}
+                                    </p>
+                                  ) : null}
+                                </div>
+                              </div>
+
+                              {showSecondNewPetField ? (
+                                <Input
+                                  type="text"
+                                  placeholder="Ім'я другого нового улюбленця"
+                                  {...register(`items.${index}.secondNewPetName` as const)}
+                                  error={errors.items?.[index]?.secondNewPetName?.message}
                                 />
                               ) : null}
 
@@ -656,6 +799,8 @@ export function BookingModal({
                       append({
                         catId: pets[0] ? String(pets[0].id) : NEW_PET_OPTION,
                         newPetName: '',
+                        secondCatId: '',
+                        secondNewPetName: '',
                         roomId: '',
                         serviceIds: [],
                       });

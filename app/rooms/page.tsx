@@ -181,9 +181,24 @@ export default function RoomsPage() {
     try {
       const response = await Api.bookings.createCheckout({
         bookingItems: data.bookingItems.map((item) => {
+          const catIds = item.pets
+            .map((pet) => {
+              return pet.catId;
+            })
+            .filter((catId): catId is number => {
+              return typeof catId === 'number';
+            });
+          const petNames = item.pets
+            .map((pet) => {
+              return pet.petName;
+            })
+            .filter((petName): petName is string => {
+              return typeof petName === 'string' && petName.trim().length > 0;
+            });
+
           return {
-            ...(typeof item.catId === 'number' ? { catId: item.catId } : {}),
-            ...(typeof item.petName === 'string' ? { petName: item.petName } : {}),
+            ...(catIds.length > 0 ? { catIds } : {}),
+            ...(petNames.length > 0 ? { petNames } : {}),
             roomId: item.roomId,
             serviceIds: item.services.map((service) => {
               return service.serviceId;

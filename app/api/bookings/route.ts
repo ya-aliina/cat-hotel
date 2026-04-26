@@ -8,7 +8,9 @@ import { prisma } from '@/prisma/prisma-client';
 
 type BookingCheckoutItem = {
   catId?: number;
+  catIds?: number[];
   petName?: string;
+  petNames?: string[];
   roomId?: number;
   serviceIds?: number[];
 };
@@ -26,9 +28,11 @@ type BookingCheckoutRequest = {
 };
 
 type Allocation = {
-  catId?: number;
   categoryPrice: number;
-  petName?: string;
+  pets: Array<{
+    catId?: number;
+    petName?: string;
+  }>;
   roomId: number;
   serviceIds: number[];
 };
@@ -113,30 +117,90 @@ function parseBody(body: unknown) {
   const bookingItems = payload.bookingItems
     .map((item) => {
       const parsedCatId = parsePositiveInt(item?.catId);
+      const parsedCatIds = Array.isArray(item?.catIds)
+        ? Array.from(
+            new Set(
+              item.catIds
+                .map((catId) => {
+                  return parsePositiveInt(catId);
+                })
+                .filter((catId): catId is number => {
+                  return typeof catId === 'number';
+                }),
+            ),
+          )
+        : [];
       const parsedRoomId = parsePositiveInt(item?.roomId);
       const petName = normalizeText(item?.petName);
+      const parsedPetNames = Array.isArray(item?.petNames)
+        ? item.petNames
+            .map((candidate) => {
+              return normalizeText(candidate);
+            })
+            .filter((candidate) => {
+              return candidate.length > 0;
+            })
+        : [];
+      const pets = [
+        ...(typeof parsedCatId === 'number' ? [{ catId: parsedCatId }] : []),
+        ...(petName.length > 0 ? [{ petName }] : []),
+        ...parsedCatIds.map((catId) => {
+          return { catId };
+        }),
+        ...parsedPetNames.map((name) => {
+          return { petName: name };
+        }),
+      ];
+      const uniqueCatIds = new Set(
+        pets
+          .map((pet) => {
+            return pet.catId;
+          })
+          .filter((catId): catId is number => {
+            return typeof catId === 'number';
+          }),
+      );
 
       return {
-        ...(typeof parsedCatId === 'number' ? { catId: parsedCatId } : {}),
-        ...(petName.length > 0 ? { petName } : {}),
+        pets,
         roomId: parsedRoomId,
         serviceIds: parseServiceIds(item?.serviceIds),
+        uniqueCatIdsCount: uniqueCatIds.size,
       };
     })
     .flatMap((item) => {
       if (!item.roomId) {
         return [] as Array<{
-          catId?: number;
-          petName?: string;
+          pets: Array<{
+            catId?: number;
+            petName?: string;
+          }>;
           roomId: number;
           serviceIds: number[];
         }>;
       }
 
-      if (typeof item.catId !== 'number' && typeof item.petName !== 'string') {
+      if (item.pets.length < 1 || item.pets.length > 2) {
         return [] as Array<{
-          catId?: number;
-          petName?: string;
+          pets: Array<{
+            catId?: number;
+            petName?: string;
+          }>;
+          roomId: number;
+          serviceIds: number[];
+        }>;
+      }
+
+      const parsedCatIdsCount = item.pets.filter((pet) => {
+        return typeof pet.catId === 'number';
+      }).length;
+
+      if (parsedCatIdsCount !== item.uniqueCatIdsCount) {
+        return [] as Array<{
+          pets: Array<{
+            catId?: number;
+            petName?: string;
+          }>;
           roomId: number;
           serviceIds: number[];
         }>;
@@ -144,8 +208,9 @@ function parseBody(body: unknown) {
 
       return [
         {
-          ...item,
+          pets: item.pets,
           roomId: item.roomId,
+          serviceIds: item.serviceIds,
         },
       ];
     });
@@ -326,9 +391,8 @@ export async function POST(request: NextRequest) {
 
           usedRoomIds.add(freeRoom.id);
           allocations.push({
-            ...(typeof item.catId === 'number' ? { catId: item.catId } : {}),
-            ...(typeof item.petName === 'string' ? { petName: item.petName } : {}),
             categoryPrice: Number(category.price),
+            pets: item.pets,
             roomId: freeRoom.id,
             serviceIds: item.serviceIds,
           });
@@ -421,8 +485,10 @@ export async function POST(request: NextRequest) {
         const explicitCatIds = Array.from(
           new Set(
             allocations
-              .map((item) => {
-                return item.catId;
+              .flatMap((item) => {
+                return item.pets.map((pet) => {
+                  return pet.catId;
+                });
               })
               .filter((catId): catId is number => {
                 return typeof catId === 'number';
@@ -445,25 +511,31 @@ export async function POST(request: NextRequest) {
           throw new Error('INVALID_CAT');
         }
 
-        const catIds: number[] = [];
+        const allocationPetIds: number[][] = [];
 
         for (const item of allocations) {
-          if (typeof item.catId === 'number') {
-            catIds.push(item.catId);
-            continue;
+          const petsForAllocation: number[] = [];
+
+          for (const pet of item.pets) {
+            if (typeof pet.catId === 'number') {
+              petsForAllocation.push(pet.catId);
+              continue;
+            }
+
+            const cat = await tx.cat.create({
+              data: {
+                name: pet.petName ?? 'Улюбленець',
+                ownerId: user.id,
+              },
+              select: {
+                id: true,
+              },
+            });
+
+            petsForAllocation.push(cat.id);
           }
 
-          const cat = await tx.cat.create({
-            data: {
-              name: item.petName ?? 'Улюбленець',
-              ownerId: user.id,
-            },
-            select: {
-              id: true,
-            },
-          });
-
-          catIds.push(cat.id);
+          allocationPetIds.push(petsForAllocation);
         }
 
         const booking = await tx.booking.create({
@@ -474,26 +546,29 @@ export async function POST(request: NextRequest) {
             totalPrice: toMoney(totalAmount),
             userId: user.id,
             bookingItems: {
-              create: allocations.map((item, index) => {
+              create: allocations.flatMap((item, index) => {
                 const roomAmount = item.categoryPrice * nights;
+                const petIds = allocationPetIds[index] ?? [];
 
-                return {
-                  catId: catIds[index],
-                  priceAtBooking: toMoney(roomAmount),
-                  roomId: item.roomId,
-                  services:
-                    item.serviceIds.length > 0
-                      ? {
-                          create: item.serviceIds.map((serviceId) => {
-                            return {
-                              price: toMoney(servicePriceMap.get(serviceId) ?? 0),
-                              quantity: 1,
-                              serviceId,
-                            };
-                          }),
-                        }
-                      : undefined,
-                };
+                return petIds.map((catId, petIndex) => {
+                  return {
+                    catId,
+                    priceAtBooking: toMoney(petIndex === 0 ? roomAmount : 0),
+                    roomId: item.roomId,
+                    services:
+                      petIndex === 0 && item.serviceIds.length > 0
+                        ? {
+                            create: item.serviceIds.map((serviceId) => {
+                              return {
+                                price: toMoney(servicePriceMap.get(serviceId) ?? 0),
+                                quantity: 1,
+                                serviceId,
+                              };
+                            }),
+                          }
+                        : undefined,
+                  };
+                });
               }),
             },
           },
