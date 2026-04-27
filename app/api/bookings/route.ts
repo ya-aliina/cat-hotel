@@ -284,7 +284,7 @@ async function createStripeCheckout(params: {
       bookingId: String(params.bookingId),
     },
     mode: 'payment',
-    success_url: `${appUrl}/rooms?payment=success&bookingId=${params.bookingId}`,
+    success_url: `${appUrl}/rooms?payment=success&bookingId=${params.bookingId}&session_id={CHECKOUT_SESSION_ID}`,
   });
 
   return checkout;

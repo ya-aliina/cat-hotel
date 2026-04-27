@@ -70,6 +70,7 @@ export default function RoomsPage() {
     const queryParams = new URLSearchParams(window.location.search);
     const paymentParam = queryParams.get('payment');
     const bookingIdParam = queryParams.get('bookingId');
+    const sessionIdParam = queryParams.get('session_id');
 
     if (!paymentParam || !bookingIdParam) {
       return;
@@ -95,6 +96,14 @@ export default function RoomsPage() {
       }
 
       try {
+        if (paymentParam === 'success') {
+          try {
+            await Api.bookings.confirmPayment(bookingId, sessionIdParam ?? undefined);
+          } catch {
+            // Webhook may still complete the status update later; we still fetch current status below.
+          }
+        }
+
         const booking = await Api.bookings.getById(bookingId);
 
         if (cancelled) {

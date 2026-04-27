@@ -34,6 +34,22 @@ export type BookingCheckoutResponse = {
   totalPrice: string;
 };
 
+type ConfirmBookingPaymentResponse = {
+  bookingId: number;
+  status: 'PENDING' | 'SUCCEEDED' | 'CANCELLED';
+  success: boolean;
+};
+
 export async function createCheckout(payload: BookingCheckoutPayload) {
   return (await axiosInstance.post<BookingCheckoutResponse>(ApiRoutes.BOOKINGS, payload)).data;
+}
+export async function confirmPayment(bookingId: number, sessionId?: string) {
+  return (
+    await axiosInstance.patch<ConfirmBookingPaymentResponse>(
+      `${ApiRoutes.BOOKINGS}/${bookingId}/pay`,
+      {
+        ...(sessionId ? { sessionId } : {}),
+      },
+    )
+  ).data;
 }

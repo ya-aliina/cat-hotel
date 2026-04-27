@@ -42,7 +42,9 @@ export function CurrentBookingsSection({ onOpenHistory }: CurrentBookingsSection
       setError(null);
 
       const response = await fetch('/api/account/bookings');
-      const responseData = (await response.json().catch(() => null)) as BookingsResponse | null;
+      const responseData = (await response.json().catch(() => {
+        return null;
+      })) as BookingsResponse | null;
 
       if (!isMounted) {
         return;
@@ -82,6 +84,33 @@ export function CurrentBookingsSection({ onOpenHistory }: CurrentBookingsSection
     }
   };
 
+  const handleCancelBooking = async (bookingId: number) => {
+    const confirmed = window.confirm('Ви дійсно хочете скасувати бронювання?');
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/account/bookings/${bookingId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        setError('Не вдалося скасувати бронювання.');
+        return;
+      }
+
+      setBookings((currentBookings) => {
+        return currentBookings.filter((booking) => {
+          return booking.id !== bookingId;
+        });
+      });
+    } catch {
+      setError('Не вдалося скасувати бронювання.');
+    }
+  };
+
   return (
     <section
       id="bookings"
@@ -107,7 +136,10 @@ export function CurrentBookingsSection({ onOpenHistory }: CurrentBookingsSection
                 історію бронювань
               </button>
             ) : (
-              <a href="#bookings-history" className="font-medium text-brand-orange hover:text-brand-text">
+              <a
+                href="#bookings-history"
+                className="font-medium text-brand-orange hover:text-brand-text"
+              >
                 історію бронювань
               </a>
             )}
@@ -132,9 +164,7 @@ export function CurrentBookingsSection({ onOpenHistory }: CurrentBookingsSection
                     </p>
                   </div>
 
-                  <span
-                    className="inline-flex w-fit rounded-full bg-brand-yellow/30 px-3 py-1 text-[13px] font-semibold text-brand-text"
-                  >
+                  <span className="inline-flex w-fit rounded-full bg-brand-yellow/30 px-3 py-1 text-[13px] font-semibold text-brand-text">
                     {getStatusLabel(booking.status)}
                   </span>
                 </div>
@@ -149,6 +179,16 @@ export function CurrentBookingsSection({ onOpenHistory }: CurrentBookingsSection
                     {formatDate(booking.endDate)}
                   </p>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    return handleCancelBooking(booking.id);
+                  }}
+                  className="mt-4 rounded-full bg-red-100 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-200"
+                >
+                  Скасувати бронювання
+                </button>
               </article>
             );
           })}
