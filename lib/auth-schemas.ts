@@ -12,7 +12,11 @@ const emailFieldSchema = z
   .min(1, 'Обовʼязкове поле.')
   .email('Некоректний формат email.');
 
-const passwordFieldSchema = z.string().min(6, 'Пароль має містити мінімум 6 символів.');
+const passwordFieldSchema = z
+  .string()
+  .min(6, 'Пароль має містити мінімум 6 символів.')
+  .regex(/[A-Za-z]/, 'Пароль має містити хоча б одну літеру.')
+  .regex(/[0-9]/, 'Пароль має містити хоча б одну цифру.');
 
 const phoneFieldSchema = z
   .string()
